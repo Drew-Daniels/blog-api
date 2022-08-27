@@ -1,25 +1,18 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
+import postController from '../controllers/postController';
+import commentController from '../controllers/commentController';
 
 const router = Router();
 
-router.get('/', function getPosts(req: Request, res: Response): void {
-    console.log(req);
-    console.log(res);
-});
+router.get('/', postController.getPosts);
+router.post('/', postController.createPost);
 
-router.get('/:postId', function getPost(req: Request, res: Response): void {
-    console.log(req);
-    console.log(res);
-});
+router.get('/:postId', postController.getPost);
 
-router.get('/:postId/comments', function getPostComments(req: Request, res: Response): void {
-    console.log(req);
-    console.log(res);
-});
+router.get('/:postId/comments', commentController.getComments);
+router.post('/:postId/comments', commentController.createComment);
 
-router.get('/:postId/comments/:commentId', function getPostComment(req: Request, res: Response): void {
-    console.log(req);
-    console.log(res);
-});
+router.put('/:postId/comments/:commentId', commentController.updateComment);
+router.delete('/:postId/comments/:commentId', commentController.deleteComment);
 
 export default router;

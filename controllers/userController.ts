@@ -35,8 +35,33 @@ async function getUserPosts(req: Request, res: Response, next: NextFunction): Pr
     res.status(400).end();
 }
 
-export default {
+async function createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const { firstName, lastName, username, password } = req.body;
+    // hash password
+    // save in db
+    // return response code and new user data
+}
+
+async function updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const { firstName, lastName, username, password } = req.body;
+    // check authenticated
+    // save in db
+    // return response code and new user data
+}
+
+async function deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // check authenticated
+    // delete from db
+    // return response code
+}
+
+const userController = {
     getUsers,
     getUser,
     getUserPosts,
+    createUser,
+    updateUser,
+    deleteUser,
 }
+
+export default userController;

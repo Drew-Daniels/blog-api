@@ -50,8 +50,35 @@ function getUserPosts(req, res, next) {
         res.status(400).end();
     });
 }
-exports.default = {
+function createUser(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { firstName, lastName, username, password } = req.body;
+        // hash password
+        // save in db
+        // return response code and new user data
+    });
+}
+function updateUser(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { firstName, lastName, username, password } = req.body;
+        // check authenticated
+        // save in db
+        // return response code and new user data
+    });
+}
+function deleteUser(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // check authenticated
+        // delete from db
+        // return response code
+    });
+}
+const userController = {
     getUsers,
     getUser,
     getUserPosts,
+    createUser,
+    updateUser,
+    deleteUser,
 };
+exports.default = userController;

@@ -9,12 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPost = exports.getPosts = void 0;
 const postModel_1 = require("../models/postModel");
 function getPosts(_req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const posts = postModel_1.Post.find().exec();
+            const posts = yield postModel_1.Post.find().exec();
+            // hydrate each post with comments
             res.status(200).json({ posts });
         }
         catch (err) {
@@ -22,7 +22,6 @@ function getPosts(_req, res, next) {
         }
     });
 }
-exports.getPosts = getPosts;
 function getPost(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         if (req.params['postId']) {
@@ -37,4 +36,37 @@ function getPost(req, res, next) {
         res.status(400).end();
     });
 }
-exports.getPost = getPost;
+function getUserPosts(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+    });
+}
+function createPost(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // validate authenticated
+        // save in db
+        // send response code and return new post
+    });
+}
+function updatePost(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // validate authenticated
+        // save in db
+        // send response code and return post
+    });
+}
+function deletePost(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // validate authenticated
+        // save in db
+        // send response code and return post
+    });
+}
+const postController = {
+    getPosts,
+    getPost,
+    getUserPosts,
+    createPost,
+    updatePost,
+    deletePost,
+};
+exports.default = postController;
