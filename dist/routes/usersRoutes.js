@@ -9,7 +9,6 @@ const postController_1 = __importDefault(require("../controllers/postController"
 const router = (0, express_1.Router)();
 router.get('/', userController_1.default.getUsers);
 router.put('/', userController_1.default.updateUser);
-router.post('/', userController_1.default.createUser);
 router.get('/:userId', userController_1.default.getUser);
 router.delete('/:userId', userController_1.default.deleteUser);
 router.get('/:userId/posts', postController_1.default.getUserPosts);

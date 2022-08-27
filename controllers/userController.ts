@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
+import bcrypt from "bcryptjs";
+
 import { User } from '../models/userModel';
 import { Post } from "../models/postModel";
-import bcrypt from "bcryptjs";
 
 async function getUsers(_req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -33,11 +34,16 @@ async function getUserPosts(req: Request, res: Response, next: NextFunction): Pr
             next(err);
         }
   }
-  res.status(400).end();
+  res.sendStatus(400);
 }
 
 async function createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { firstName, lastName, username, password } = req.body;
+  // check that this username is not already taken
+  const userExists = !!await User.count({ username }).exec();
+  if (userExists) {
+    res.status(409).send({ error: 'A user with that username already exists' });
+  }
   // hash pwd
   bcrypt.genSalt(10, function onSaltGenerated(err, salt) {
     if (err) { next(err); }
@@ -52,7 +58,7 @@ async function createUser(req: Request, res: Response, next: NextFunction): Prom
       });
       user.save(function onUserSaved(err) {
         if (err) { return next(err); }
-        res.status(200).json({ user });
+        res.send({ user });
       });
     });
   });

@@ -12,9 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userModel_1 = require("../models/userModel");
 const postModel_1 = require("../models/postModel");
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
 function getUsers(_req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -51,12 +51,17 @@ function getUserPosts(req, res, next) {
                 next(err);
             }
         }
-        res.status(400).end();
+        res.sendStatus(400);
     });
 }
 function createUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { firstName, lastName, username, password } = req.body;
+        // check that this username is not already taken
+        const userExists = !!(yield userModel_1.User.count({ username }).exec());
+        if (userExists) {
+            res.status(409).send({ error: 'A user with that username already exists' });
+        }
         // hash pwd
         bcryptjs_1.default.genSalt(10, function onSaltGenerated(err, salt) {
             if (err) {
@@ -77,7 +82,7 @@ function createUser(req, res, next) {
                     if (err) {
                         return next(err);
                     }
-                    res.status(200).json({ user });
+                    res.send({ user });
                 });
             });
         });

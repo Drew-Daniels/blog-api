@@ -22,6 +22,7 @@ app.use(express_1.default.urlencoded({ extended: false }));
 var mongoDb = process.env['DB_DEV'];
 mongoose_1.default.connect(mongoDb);
 mongoose_1.default.connection.on('error', console.error.bind(console, 'MongoDb connection error: '));
+app.use(passportConfig_1.default.initialize());
 app.use('/auth', authRoutes_1.default);
 app.use('/users', passportConfig_1.default.authenticate('jwt', { session: false }), usersRoutes_1.default);
 app.use('/posts', passportConfig_1.default.authenticate('jwt', { session: false }), postsRoutes_1.default);

@@ -26,6 +26,8 @@ var mongoDb = process.env['DB_DEV'] as string;
 mongoose.connect(mongoDb);
 mongoose.connection.on('error', console.error.bind(console, 'MongoDb connection error: '));
 
+app.use(passport.initialize());
+
 app.use('/auth', authRouter);
 app.use('/users', passport.authenticate('jwt', { session: false }), usersRouter);
 app.use('/posts', passport.authenticate('jwt', { session: false }), postsRouter);
