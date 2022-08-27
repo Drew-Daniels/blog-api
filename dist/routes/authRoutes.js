@@ -31,8 +31,8 @@ router.post('/', function handleLogin(req, res, next) {
         // generate signed token
         const MINUTE = 60;
         const tokenOpts = { expiresIn: 5 * MINUTE };
-        const token = jsonwebtoken_1.default.sign(user, process.env['SECRET'], tokenOpts);
-        return res.status(200).json({ user, token });
+        const token = jsonwebtoken_1.default.sign(user.toJSON(), process.env['SECRET'], tokenOpts);
+        return res.send({ user, token });
     })(req, res);
 });
 router.post('/signup', [

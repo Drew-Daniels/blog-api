@@ -7,7 +7,7 @@ import { Post } from "../models/postModel";
 async function getUsers(_req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
         const users = User.find().exec();
-        res.status(200).json({ users });
+        res.send({ users });
   } catch (err) {
         next(err);
   }
@@ -17,7 +17,7 @@ async function getUser(req: Request, res: Response, next: NextFunction): Promise
   if (req.params["userId"]) {
         try {
             const user = User.findById(req.params["userId"]).exec();
-            res.status(200).json({ user });
+            res.send({ user });
         } catch (err) {
             next(err);
         }
@@ -29,7 +29,7 @@ async function getUserPosts(req: Request, res: Response, next: NextFunction): Pr
   if (req.params['userId']) {
         try {
             const posts = Post.find({ userId: req.params["userId"] }).exec();
-            res.status(200).json({ posts });
+            res.send({ posts });
         } catch (err) {
             next(err);
         }

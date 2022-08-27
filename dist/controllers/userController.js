@@ -19,7 +19,7 @@ function getUsers(_req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const users = userModel_1.User.find().exec();
-            res.status(200).json({ users });
+            res.send({ users });
         }
         catch (err) {
             next(err);
@@ -31,7 +31,7 @@ function getUser(req, res, next) {
         if (req.params["userId"]) {
             try {
                 const user = userModel_1.User.findById(req.params["userId"]).exec();
-                res.status(200).json({ user });
+                res.send({ user });
             }
             catch (err) {
                 next(err);
@@ -45,7 +45,7 @@ function getUserPosts(req, res, next) {
         if (req.params['userId']) {
             try {
                 const posts = postModel_1.Post.find({ userId: req.params["userId"] }).exec();
-                res.status(200).json({ posts });
+                res.send({ posts });
             }
             catch (err) {
                 next(err);

@@ -26,8 +26,8 @@ router.post('/', function handleLogin(req, res, next) {
     // generate signed token
     const MINUTE = 60;
     const tokenOpts = { expiresIn: 5 * MINUTE };
-    const token = jwt.sign(user, process.env['SECRET'] as string, tokenOpts);
-    return res.status(200).json({ user, token });
+    const token = jwt.sign(user.toJSON(), process.env['SECRET'] as string, tokenOpts);
+    return res.send({ user, token });
   })(req, res);
 });
 
