@@ -8,9 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const userModel_1 = require("../models/userModel");
 const postModel_1 = require("../models/postModel");
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 function getUsers(_req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -53,9 +57,30 @@ function getUserPosts(req, res, next) {
 function createUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { firstName, lastName, username, password } = req.body;
-        // hash password
-        // save in db
-        // return response code and new user data
+        // hash pwd
+        bcryptjs_1.default.genSalt(10, function onSaltGenerated(err, salt) {
+            if (err) {
+                next(err);
+            }
+            bcryptjs_1.default.hash(password, salt, function onHashGenerated(err, hash) {
+                if (err) {
+                    next(err);
+                }
+                // create new user
+                const user = new userModel_1.User({
+                    firstName,
+                    lastName,
+                    username,
+                    hash,
+                });
+                user.save(function onUserSaved(err) {
+                    if (err) {
+                        return next(err);
+                    }
+                    res.status(200).json({ user });
+                });
+            });
+        });
     });
 }
 function updateUser(req, res, next) {

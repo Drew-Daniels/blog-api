@@ -1,67 +1,83 @@
 import { Request, Response, NextFunction } from "express";
 import { User } from '../models/userModel';
 import { Post } from "../models/postModel";
+import bcrypt from "bcryptjs";
 
 async function getUsers(_req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
+  try {
         const users = User.find().exec();
         res.status(200).json({ users });
-    } catch (err) {
+  } catch (err) {
         next(err);
-    }
+  }
 }
 
 async function getUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-    if (req.params["userId"]) {
+  if (req.params["userId"]) {
         try {
             const user = User.findById(req.params["userId"]).exec();
             res.status(200).json({ user });
         } catch (err) {
             next(err);
         }
-    }
-    res.status(400).end();
+  }
+  res.status(400).end();
 }
 
 async function getUserPosts(req: Request, res: Response, next: NextFunction): Promise<void> {
-    if (req.params['userId']) {
+  if (req.params['userId']) {
         try {
             const posts = Post.find({ userId: req.params["userId"] }).exec();
             res.status(200).json({ posts });
         } catch (err) {
             next(err);
         }
-    }
-    res.status(400).end();
+  }
+  res.status(400).end();
 }
 
 async function createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const { firstName, lastName, username, password } = req.body;
-    // hash password
-    // save in db
-    // return response code and new user data
+  const { firstName, lastName, username, password } = req.body;
+  // hash pwd
+  bcrypt.genSalt(10, function onSaltGenerated(err, salt) {
+    if (err) { next(err); }
+    bcrypt.hash(password, salt, function onHashGenerated(err, hash) {
+      if (err) { next(err) }
+      // create new user
+      const user = new User({
+        firstName,
+        lastName,
+        username,
+        hash,
+      });
+      user.save(function onUserSaved(err) {
+        if (err) { return next(err); }
+        res.status(200).json({ user });
+      });
+    });
+  });
 }
 
 async function updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const { firstName, lastName, username, password } = req.body;
-    // check authenticated
-    // save in db
-    // return response code and new user data
+  const { firstName, lastName, username, password } = req.body;
+  // check authenticated
+  // save in db
+  // return response code and new user data
 }
 
 async function deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-    // check authenticated
-    // delete from db
-    // return response code
+  // check authenticated
+  // delete from db
+  // return response code
 }
 
 const userController = {
-    getUsers,
-    getUser,
-    getUserPosts,
-    createUser,
-    updateUser,
-    deleteUser,
+  getUsers,
+  getUser,
+  getUserPosts,
+  createUser,
+  updateUser,
+  deleteUser,
 }
 
 export default userController;
