@@ -7,7 +7,7 @@ import usersRouter from './routes/usersRoutes';
 import postsRouter from './routes/postsRoutes';
 
 const app: Express = express();
-const PORT = process.env.PORT;
+const PORT = process.env['PORT'];
 
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
