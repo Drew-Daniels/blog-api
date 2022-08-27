@@ -6,9 +6,9 @@ import postController from "../controllers/postController";
 const router = Router();
 
 router.get('/', userController.getUsers);
-router.put('/', userController.updateUser);
 
 router.get('/:userId', userController.getUser);
+router.put('/:userId', userController.updateUser);
 router.delete('/:userId', userController.deleteUser);
 
 router.get('/:userId/posts', postController.getUserPosts);

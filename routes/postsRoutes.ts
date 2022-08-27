@@ -8,6 +8,8 @@ router.get('/', postController.getPosts);
 router.post('/', postController.createPost);
 
 router.get('/:postId', postController.getPost);
+router.put('/:postId', postController.updatePost);
+router.delete('/:postId', postController.deletePost);
 
 router.get('/:postId/comments', commentController.getComments);
 router.post('/:postId/comments', commentController.createComment);
