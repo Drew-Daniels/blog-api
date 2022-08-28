@@ -9,10 +9,6 @@ const router = Router();
 
 router.get('/', postController.getPosts);
 router.post('/', [
-  check('author')
-    .exists()
-    .isString()
-    .withMessage('Author is a required string'),
   check('title')
     .exists()
     .isString()

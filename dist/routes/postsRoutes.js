@@ -11,10 +11,6 @@ const utils_1 = require("../utils/utils");
 const router = (0, express_1.Router)();
 router.get('/', postController_1.default.getPosts);
 router.post('/', [
-    (0, express_validator_1.check)('author')
-        .exists()
-        .isString()
-        .withMessage('Author is a required string'),
     (0, express_validator_1.check)('title')
         .exists()
         .isString()

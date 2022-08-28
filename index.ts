@@ -28,9 +28,9 @@ mongoose.connection.on('error', console.error.bind(console, 'MongoDb connection 
 
 app.use(passport.initialize());
 
-app.use('/auth', authRouter);
-app.use('/users', passport.authenticate('jwt', { session: false }), usersRouter);
-app.use('/posts', passport.authenticate('jwt', { session: false }), postsRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/users', passport.authenticate('jwt', { session: false }), usersRouter);
+app.use('/api/posts', passport.authenticate('jwt', { session: false }), postsRouter);
 
 app.listen(PORT, () => {
    console.log(`[server]: Server is running at https://localhost:${PORT}`);

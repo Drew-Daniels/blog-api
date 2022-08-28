@@ -58,10 +58,10 @@ function getUserPosts(req, res, next) {
 }
 function createPost(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { title, body, author } = req.body;
+        const { title, body } = req.body;
         try {
             const post = yield postModel_1.Post.create({
-                author,
+                author: req.user._id,
                 title,
                 body,
             });

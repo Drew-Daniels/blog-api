@@ -49,10 +49,10 @@ async function getUserPosts(req: Request, res: Response, next: NextFunction): Pr
 }
 
 async function createPost(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const { title, body, author } = req.body;
+  const { title, body } = req.body;
   try {
     const post = await Post.create({
-      author,
+      author: req.user!._id,
       title,
       body,
     });
