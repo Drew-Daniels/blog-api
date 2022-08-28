@@ -4,7 +4,7 @@ import { Comment } from "../models/commentModel";
 async function getComments(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { postId } = req.params;
   try {
-    const comments = await Comment.find({ postId });
+    const comments = await Comment.find({ postId }).lean();
     res.send({ comments });
   } catch (err) {
       next(err);
@@ -32,7 +32,7 @@ async function updateComment(req: Request, res: Response, next: NextFunction) {
   try {
     const comment = await Comment.findByIdAndUpdate(commentId, { body }, { returnDocument: 'after' })
     console.log(`Comment ${commentId} has been updated: ${comment}`);
-    res.sendStatus(200);
+    res.send({ comment });
   } catch (err) {
     next(err);
   }

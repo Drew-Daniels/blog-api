@@ -11,12 +11,30 @@ const express_validator_1 = require("express-validator");
 const router = (0, express_1.Router)();
 router.get('/', userController_1.default.getUsers);
 router.get('/:userId', userController_1.default.getUser);
+// no POST - users must hit /auth/signup endpoint to create new users
 router.put('/:userId', [
-    (0, express_validator_1.check)('firstName'),
-    (0, express_validator_1.check)('lastName'),
-    (0, express_validator_1.check)('username'),
-    (0, express_validator_1.check)('password'),
-    (0, express_validator_1.check)('passwordConfirm'),
+    (0, express_validator_1.check)('firstName')
+        .exists()
+        .isString()
+        .isLength({ min: 1, max: 30 })
+        .withMessage('First name is a required string and must be between 1 and 30 characters'),
+    (0, express_validator_1.check)('lastName')
+        .exists()
+        .isString()
+        .isLength({ min: 1, max: 30 })
+        .withMessage('Last name is a required string and must be between 1 and 30 characters'),
+    (0, express_validator_1.check)('username')
+        .exists()
+        .isString()
+        .isEmail()
+        .withMessage('Username is required and must be an email address'),
+    (0, express_validator_1.check)('password')
+        .exists()
+        .isString()
+        .isStrongPassword()
+        .withMessage('Password is a required string'),
+    (0, express_validator_1.check)('passwordConfirm')
+        .custom(utils_1.passwordValidator),
     utils_1.onValidated,
     userController_1.default.updateUser
 ]);

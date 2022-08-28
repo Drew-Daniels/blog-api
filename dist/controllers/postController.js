@@ -10,12 +10,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const postModel_1 = require("../models/postModel");
+const commentModel_1 = require("../models/commentModel");
 function getPosts(_req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const posts = yield postModel_1.Post.find();
-            // TODO: hydrate w/ comments
-            res.status(200).json({ posts });
+            const postsMinusComments = yield postModel_1.Post.find().lean();
+            // TODO: Create an interface that
+            const postsPlusComments = yield Promise.all(postsMinusComments.map(function supplyPostWithComments(post) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const comments = yield commentModel_1.Comment.find({ post: post._id }).lean();
+                    return Object.assign(Object.assign({}, post), { comments: comments });
+                });
+            }));
+            res.send({ posts: postsPlusComments });
         }
         catch (err) {
             next(err);
@@ -78,7 +85,7 @@ function updatePost(req, res, next) {
         try {
             const post = yield postModel_1.Post.findByIdAndUpdate(postId, { title, body }, { returnDocument: 'after' });
             console.log(`Post ${postId} has been updated: ${post}`);
-            res.sendStatus(200);
+            res.send({ post });
         }
         catch (err) {
             next(err);

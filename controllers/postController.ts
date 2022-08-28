@@ -1,11 +1,25 @@
 import { Request, Response, NextFunction } from "express";
-import { Post } from '../models/postModel';
+import { Types } from "mongoose";
+import { IPost, Post } from '../models/postModel';
+import { IComment, Comment } from '../models/commentModel';
+
+interface ILeanPost extends IPost {
+  _id: Types.ObjectId;
+}
+
+interface PostWithComments extends ILeanPost {
+  comments: Array<IComment & { _id: Types.ObjectId } >
+}
 
 async function getPosts(_req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const posts = await Post.find();
-    // TODO: hydrate w/ comments
-    res.status(200).json({ posts });
+    const postsMinusComments = await Post.find().lean();
+    // TODO: Create an interface that
+    const postsPlusComments = await Promise.all(postsMinusComments.map(async function supplyPostWithComments(post: IPost): Promise<PostWithComments> {
+      const comments = await Comment.find({ post: post._id }).lean();
+      return { ...post, comments: comments }
+    }));
+    res.send({ posts: postsPlusComments });
   } catch (err) {
       next(err);
   }
@@ -58,7 +72,7 @@ async function updatePost(req: Request, res: Response, next: NextFunction): Prom
   try {
     const post = await Post.findByIdAndUpdate(postId, {title, body }, { returnDocument: 'after' });
     console.log(`Post ${postId} has been updated: ${post}`);
-    res.sendStatus(200);
+    res.send({ post });
   } catch (err) {
     next(err);
   }

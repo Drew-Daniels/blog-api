@@ -14,7 +14,7 @@ function getComments(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { postId } = req.params;
         try {
-            const comments = yield commentModel_1.Comment.find({ postId });
+            const comments = yield commentModel_1.Comment.find({ postId }).lean();
             res.send({ comments });
         }
         catch (err) {
@@ -46,7 +46,7 @@ function updateComment(req, res, next) {
         try {
             const comment = yield commentModel_1.Comment.findByIdAndUpdate(commentId, { body }, { returnDocument: 'after' });
             console.log(`Comment ${commentId} has been updated: ${comment}`);
-            res.sendStatus(200);
+            res.send({ comment });
         }
         catch (err) {
             next(err);

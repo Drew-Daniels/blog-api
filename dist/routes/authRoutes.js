@@ -35,6 +35,7 @@ router.post('/', function handleLogin(req, res, next) {
         return res.send({ user, token });
     })(req, res);
 });
+// '/signup' has to be under an unprotected route ('/auth/signup' vs. '/users' bc 'users' is a route that req. auth)
 router.post('/signup', [
     (0, express_validator_1.check)('firstName')
         .exists()

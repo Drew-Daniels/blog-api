@@ -30,7 +30,7 @@ router.post('/', function handleLogin(req, res, next) {
     return res.send({ user, token });
   })(req, res);
 });
-
+// '/signup' has to be under an unprotected route ('/auth/signup' vs. '/users' bc 'users' is a route that req. auth)
 router.post('/signup', [
   check('firstName')
     .exists()

@@ -63,6 +63,7 @@ function createUser(req, res, next) {
         const { firstName, lastName, username, password } = req.body;
         const userExists = !!(yield userModel_1.User.count({ username }));
         if (userExists) {
+            console.log('here');
             res.status(409).send({ error: 'A user with that username already exists' });
         }
         // hash pwd
