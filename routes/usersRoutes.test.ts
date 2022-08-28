@@ -1,16 +1,20 @@
-describe('POST "api/auth"', () => {
+describe('GET /api/users', () => {
+  test.todo('returns an error response when request is unauthenticated');
+  test.todo('returns all users when request is authenticated');
+});
+describe('GET /api/users/:userId', () => {
   describe('returns an error response when: ', () => {
-    test.todo('username provided does not match a registered user');
-    test.todo('password provided does not match a registered user');
+    test.todo('request is unauthenticated');
+    test.todo('request is authenticated but userId does not belong to a user in the db');
   });
-  describe('returns authenticated user w/ token when: ', () => {
-    test.todo('registered user provides correct credentials');
+  describe('returns user when: ', () => {
+    test.todo('request is authenticated and userId belongs to a user in the db');
   });
 });
-
-describe('POST "api/auth/signup"', () => {
+describe('PUT /api/users/:userId', () => {
   describe('returns an error response when: ', () => {
-    // TODO: Make these tests less redundant
+    test.todo('request is unauthenticated');
+    test.todo('userId does not belong to a user in the db');
     describe('firstName is: ', () => {
       test.todo('undefined');
       test.todo('not a string');
@@ -36,7 +40,7 @@ describe('POST "api/auth/signup"', () => {
       test.todo('different from password');
     });
   });
-  describe('creates and returns new user when: ', () => {
+  describe('returns an updated user when: ', () => {
     describe('firstName is: ', () => {
       test.todo('a 1 character string');
       test.todo('a string between 1 and 30 characters');
@@ -58,4 +62,10 @@ describe('POST "api/auth/signup"', () => {
       test.todo('same as password');
     });
   });
+});
+describe('DELETE /api/users/:userId', () => {
+
+});
+describe('GET /api/users/:userId/posts', () => {
+
 });

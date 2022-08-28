@@ -1,14 +1,14 @@
 "use strict";
-describe('POST "api/auth/" => LOGIN USER', () => {
+describe('POST "api/auth"', () => {
     describe('returns an error response when: ', () => {
         test.todo('username provided does not match a registered user');
         test.todo('password provided does not match a registered user');
     });
-    describe('returns an authenticated user w/ token when: ', () => {
+    describe('returns authenticated user w/ token when: ', () => {
         test.todo('registered user provides correct credentials');
     });
 });
-describe('POST "api/auth/signup" => REGISTER NEW USER', () => {
+describe('POST "api/auth/signup"', () => {
     describe('returns an error response when: ', () => {
         // TODO: Make these tests less redundant
         describe('firstName is: ', () => {
@@ -36,7 +36,7 @@ describe('POST "api/auth/signup" => REGISTER NEW USER', () => {
             test.todo('different from password');
         });
     });
-    describe('returns a success response when: ', () => {
+    describe('creates and returns new user when: ', () => {
         describe('firstName is: ', () => {
             test.todo('a 1 character string');
             test.todo('a string between 1 and 30 characters');
