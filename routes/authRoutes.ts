@@ -17,10 +17,10 @@ const router = Router();
 router.post('/', function handleLogin(req, res, next) {
   passport.authenticate('local', { session: false }, function onAuthenticationChecked(err: Error, user: IUser) {
     if (err) { return next(err) }
-    if (!user) { return res.status(401).end() }
+    if (!user) { return res.sendStatus(401); }
     req.login(user, { session: false }, function onUserLoggedIn(err) {
       if (err) {
-        res.send(err);
+        next(err);
       }
     });
     // generate signed token

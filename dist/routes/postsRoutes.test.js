@@ -1,14 +1,10 @@
 "use strict";
 describe('GET "api/posts"', () => {
     describe('returns an error response when: ', () => {
-        describe('request is: ', () => {
-            test.todo('unauthenticated');
-        });
+        test.todo('request is unauthenticated');
     });
     describe('returns all posts when: ', () => {
-        describe('request is: ', () => {
-            test.todo('authenticated');
-        });
+        test.todo('request is authenticated');
     });
 });
 describe('POST "api/posts"', () => {
@@ -33,17 +29,11 @@ describe('POST "api/posts"', () => {
 });
 describe('GET "api/posts/:postId"', () => {
     describe('returns an error response when: ', () => {
-        describe('request is: ', () => {
-            test.todo('unauthenticated');
-        });
-        describe('postId: ', () => {
-            test.todo('does not belong to a post in the db');
-        });
+        test.todo('request is unauthenticated');
+        test.todo('request is authenticated but postId does not belong to a post in the db');
     });
     describe('returns a post when: ', () => {
-        describe('postId: ', () => {
-            test.todo('belongs to a post in the db');
-        });
+        test.todo('request is authenticated and postId belongs to a post in the db');
     });
 });
 describe('PUT "api/posts/:postId"', () => {
@@ -81,9 +71,7 @@ describe('GET "api/posts/:postId/comments"', () => {
 });
 describe('POST "api/posts/:postId/comments"', () => {
     describe('returns an error response when: ', () => {
-        describe('request is: ', () => {
-            test.todo('unauthenticated');
-        });
+        test.todo('unauthenticated');
         describe('body is: ', () => {
             test.todo('undefined');
             test.todo('a blank string');

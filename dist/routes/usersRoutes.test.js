@@ -1,40 +1,21 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const supertest_1 = __importDefault(require("supertest"));
-const express_1 = __importDefault(require("express"));
-const authRoutes_1 = __importDefault(require("./authRoutes"));
-const app = (0, express_1.default)();
-app.use(express_1.default.json());
-app.use(express_1.default.urlencoded({ extended: false }));
-app.use('/', authRoutes_1.default);
-describe('POST "api/auth"', () => {
+describe('GET /api/users', () => {
+    test.todo('returns an error response when request is unauthenticated');
+    test.todo('returns all users when request is authenticated');
+});
+describe('GET /api/users/:userId', () => {
     describe('returns an error response when: ', () => {
-        test('username provided does not match a registered user', done => {
-            (0, supertest_1.default)(app)
-                .post('/')
-                .set('Accept', 'application/json')
-                .expect('Content-Type', '/json/')
-                .expect({ username: 'bob@dobbs.com', password: '6JtxHvbnAh$@V9AM' })
-                .expect(401, done);
-        });
-        test.todo('password provided does not match a registered user');
+        test.todo('request is unauthenticated');
+        test.todo('request is authenticated but userId does not belong to a user in the db');
     });
-    describe('returns authenticated user w/ token when: ', () => {
-        test('registered user provides correct credentials', done => {
-            (0, supertest_1.default)(app)
-                .post('/')
-                .set('Accept', 'application/json')
-                .expect('Content-Type', '/json/')
-                .expect({ username: 'bob@dobbs.comz', password: '6JtxHvbnAh$@V9AM' })
-                .expect(200, done);
-        });
+    describe('returns user when: ', () => {
+        test.todo('request is authenticated and userId belongs to a user in the db');
     });
 });
-describe('POST "api/auth/signup"', () => {
+describe('PUT /api/users/:userId', () => {
     describe('returns an error response when: ', () => {
+        test.todo('request is unauthenticated');
+        test.todo('userId does not belong to a user in the db');
         describe('firstName is: ', () => {
             test.todo('undefined');
             test.todo('not a string');
@@ -60,7 +41,7 @@ describe('POST "api/auth/signup"', () => {
             test.todo('different from password');
         });
     });
-    describe('creates and returns new user when: ', () => {
+    describe('returns an updated user when: ', () => {
         describe('firstName is: ', () => {
             test.todo('a 1 character string');
             test.todo('a string between 1 and 30 characters');
@@ -82,4 +63,8 @@ describe('POST "api/auth/signup"', () => {
             test.todo('same as password');
         });
     });
+});
+describe('DELETE /api/users/:userId', () => {
+});
+describe('GET /api/users/:userId/posts', () => {
 });
