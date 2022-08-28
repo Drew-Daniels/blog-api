@@ -62,10 +62,4 @@ router.post('/signup', [
     utils_1.onValidated,
     userController_1.default.createUser,
 ]);
-router.delete('/', function handleLogout(req, res) {
-    // verify token, logout user
-    console.log(req);
-    console.log(res);
-    res.sendStatus(200);
-});
 exports.default = router;
