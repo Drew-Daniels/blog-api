@@ -7,9 +7,9 @@ interface IComment extends Document {
 }
 
 const CommentSchema = new Schema<IComment>({
-  author: { type: Schema.Types.ObjectId, ref: 'User' },
-  post: { type: Schema.Types.ObjectId, ref: 'Post' },
-  body: String,
+  author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  post: { type: Schema.Types.ObjectId, ref: 'Post', required: true },
+  body: { type: String, required: true },
 }, { timestamps: true });
 
 const Comment: Model<IComment> = model<IComment>('Comment', CommentSchema);

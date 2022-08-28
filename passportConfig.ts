@@ -23,7 +23,7 @@ passport.use(new JwtStrategy({
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: process.env['SECRET'] as string,
 }, function verify(jwtPayload, cb) {
-  return User.findById(jwtPayload.userId)
+  return User.findById(jwtPayload._id)
     .then(user => {
       if (!user) { return cb(null, false) }
       return cb(null, user);

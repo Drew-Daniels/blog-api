@@ -16,6 +16,7 @@ async function createComment(req: Request, res: Response, next: NextFunction) {
   const { body } = req.body;
   try {
     const comment = await Comment.create({
+      author: req.user!._id,
       post: postId,
       body,
     });

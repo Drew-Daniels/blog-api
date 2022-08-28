@@ -8,10 +8,10 @@ interface IPost extends Document {
 }
 
 const PostSchema = new Schema<IPost>({
-  author: { type: Schema.Types.ObjectId, ref: 'User' },
-  title: String,
-  body: String,
-  isPublished: Boolean,
+  author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  title: { type: String, required: true },
+  body: { type: String, required: true },
+  isPublished: { type: String, default: false, required: true },
 }, { timestamps: true });
 
 const Post: Model<IPost> = model<IPost>('Post', PostSchema);

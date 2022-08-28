@@ -28,6 +28,7 @@ function createComment(req, res, next) {
         const { body } = req.body;
         try {
             const comment = yield commentModel_1.Comment.create({
+                author: req.user._id,
                 post: postId,
                 body,
             });
