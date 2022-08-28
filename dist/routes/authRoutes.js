@@ -57,12 +57,7 @@ router.post('/signup', [
         .isStrongPassword()
         .withMessage('Password is a required string'),
     (0, express_validator_1.check)('passwordConfirm')
-        .custom((value, { req }) => {
-        if (value !== req.body.password) {
-            throw new Error('Password confirmation does not match password');
-        }
-        return true;
-    }),
+        .custom(utils_1.passwordValidator),
     utils_1.onValidated,
     userController_1.default.createUser,
 ]);

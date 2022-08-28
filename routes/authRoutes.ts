@@ -9,7 +9,7 @@ expander.expand(env);
 
 import { IUser } from "../models/userModel";
 import { check } from "express-validator";
-import { onValidated } from "../utils/utils";
+import { onValidated, passwordValidator } from "../utils/utils";
 import userController from "../controllers/userController";
 const router = Router();
 
@@ -53,12 +53,7 @@ router.post('/signup', [
     .isStrongPassword()
     .withMessage('Password is a required string'),
   check('passwordConfirm')
-    .custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error('Password confirmation does not match password');
-      }
-      return true;
-    }),
+    .custom(passwordValidator),
   onValidated,
   userController.createUser,
 ]);

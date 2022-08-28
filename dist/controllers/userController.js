@@ -94,7 +94,7 @@ function createUser(req, res, next) {
 function updateUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { userId } = req.params;
-        const { firstName, lastName, username, password } = req.body;
+        const { firstName, lastName, username, password, isAuthor } = req.body;
         bcryptjs_1.default.genSalt(10, function onSaltGenerated(err, salt) {
             if (err) {
                 next(err);
@@ -110,6 +110,7 @@ function updateUser(req, res, next) {
                             lastName,
                             username,
                             hash,
+                            isAuthor,
                         });
                         console.log(`User ${userId} has been updated: ${username} - ${lastName}, ${firstName}`);
                         res.send({ user });

@@ -67,7 +67,7 @@ async function createUser(req: Request, res: Response, next: NextFunction): Prom
 
 async function updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { userId } = req.params;
-  const { firstName, lastName, username, password } = req.body;
+  const { firstName, lastName, username, password, isAuthor } = req.body;
   bcrypt.genSalt(10, function onSaltGenerated(err, salt) {
     if (err) { next(err); }
     bcrypt.hash(password, salt, async function onHashGenerated(err, hash) {
@@ -78,6 +78,7 @@ async function updateUser(req: Request, res: Response, next: NextFunction): Prom
           lastName,
           username,
           hash,
+          isAuthor,
         });
         console.log(`User ${userId} has been updated: ${username} - ${lastName}, ${firstName}`);
         res.send({ user });
