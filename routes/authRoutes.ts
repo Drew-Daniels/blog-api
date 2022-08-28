@@ -8,8 +8,8 @@ var env = dotenv.config();
 expander.expand(env);
 
 import { IUser } from "../models/userModel";
-import {check} from "express-validator";
-import {onValidated} from "../utils/utils";
+import { check } from "express-validator";
+import { onValidated } from "../utils/utils";
 import userController from "../controllers/userController";
 const router = Router();
 
@@ -33,16 +33,22 @@ router.post('/', function handleLogin(req, res, next) {
 
 router.post('/signup', [
   check('firstName')
+    .exists()
     .isString()
+    .isLength({ min: 1, max: 30 })
     .withMessage('First name is a required string'),
   check('lastName')
+    .exists()
     .isString()
+    .isLength({ min: 1, max: 30 })
     .withMessage('Last name is a required string'),
   check('username')
+    .exists()
     .isString()
     .isEmail()
     .withMessage('Username is required and must be an email address'),
   check('password')
+    .exists()
     .isString()
     .isStrongPassword()
     .withMessage('Password is a required string'),
@@ -54,7 +60,7 @@ router.post('/signup', [
       return true;
     }),
   onValidated,
-  userController.createUser
+  userController.createUser,
 ]);
 
 router.delete('/', function handleLogout(req, res): void {

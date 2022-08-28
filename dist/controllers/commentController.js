@@ -12,24 +12,58 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commentModel_1 = require("../models/commentModel");
 function getComments(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
+        const { postId } = req.params;
         try {
-            return commentModel_1.Comment.find({ postId }).exec();
+            const comments = yield commentModel_1.Comment.find({ postId });
+            res.send({ comments });
         }
         catch (err) {
             next(err);
         }
     });
 }
-function createComment() {
+function createComment(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
+        const { postId } = req.params;
+        const { body } = req.body;
+        try {
+            const comment = yield commentModel_1.Comment.create({
+                post: postId,
+                body,
+            });
+            console.log(`Comment added: ${comment}`);
+            res.send({ comment });
+        }
+        catch (err) {
+            next(err);
+        }
     });
 }
-function updateComment() {
+function updateComment(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
+        const { commentId } = req.params;
+        const { body } = req.body;
+        try {
+            const comment = yield commentModel_1.Comment.findByIdAndUpdate(commentId, { body }, { returnDocument: 'after' });
+            console.log(`Comment ${commentId} has been updated: ${comment}`);
+            res.sendStatus(200);
+        }
+        catch (err) {
+            next(err);
+        }
     });
 }
-function deleteComment() {
+function deleteComment(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
+        const { commentId } = req.params;
+        try {
+            yield commentModel_1.Comment.findByIdAndDelete(commentId);
+            console.log(`Comment ${commentId} deleted`);
+            res.sendStatus(200);
+        }
+        catch (err) {
+            next(err);
+        }
     });
 }
 const commentController = {

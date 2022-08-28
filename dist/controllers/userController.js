@@ -18,7 +18,7 @@ const postModel_1 = require("../models/postModel");
 function getUsers(_req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const users = userModel_1.User.find().exec();
+            const users = yield userModel_1.User.find();
             res.send({ users });
         }
         catch (err) {
@@ -30,35 +30,38 @@ function getUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         if (req.params["userId"]) {
             try {
-                const user = userModel_1.User.findById(req.params["userId"]).exec();
+                const user = yield userModel_1.User.findById(req.params["userId"]);
                 res.send({ user });
             }
             catch (err) {
                 next(err);
             }
         }
-        res.status(400).end();
+        else {
+            res.sendStatus(400);
+        }
     });
 }
 function getUserPosts(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         if (req.params['userId']) {
             try {
-                const posts = postModel_1.Post.find({ userId: req.params["userId"] }).exec();
+                const posts = yield postModel_1.Post.find({ userId: req.params["userId"] });
                 res.send({ posts });
             }
             catch (err) {
                 next(err);
             }
         }
-        res.sendStatus(400);
+        else {
+            res.sendStatus(400);
+        }
     });
 }
 function createUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { firstName, lastName, username, password } = req.body;
-        // check that this username is not already taken
-        const userExists = !!(yield userModel_1.User.count({ username }).exec());
+        const userExists = !!(yield userModel_1.User.count({ username }));
         if (userExists) {
             res.status(409).send({ error: 'A user with that username already exists' });
         }
@@ -90,17 +93,46 @@ function createUser(req, res, next) {
 }
 function updateUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
+        const { userId } = req.params;
         const { firstName, lastName, username, password } = req.body;
-        // check authenticated
-        // save in db
-        // return response code and new user data
+        bcryptjs_1.default.genSalt(10, function onSaltGenerated(err, salt) {
+            if (err) {
+                next(err);
+            }
+            bcryptjs_1.default.hash(password, salt, function onHashGenerated(err, hash) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (err) {
+                        next(err);
+                    }
+                    try {
+                        const user = yield userModel_1.User.findByIdAndUpdate(userId, {
+                            firstName,
+                            lastName,
+                            username,
+                            hash,
+                        });
+                        console.log(`User ${userId} has been updated: ${username} - ${lastName}, ${firstName}`);
+                        res.send({ user });
+                    }
+                    catch (err) {
+                        next(err);
+                    }
+                });
+            });
+        });
     });
 }
 function deleteUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        // check authenticated
-        // delete from db
-        // return response code
+        const { userId } = req.params;
+        try {
+            yield userModel_1.User.findByIdAndDelete(userId);
+            console.log(`User ${userId} has been deleted`);
+            res.sendStatus(200);
+        }
+        catch (err) {
+            next(err);
+        }
     });
 }
 const userController = {

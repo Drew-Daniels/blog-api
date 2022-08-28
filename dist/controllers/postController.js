@@ -13,8 +13,8 @@ const postModel_1 = require("../models/postModel");
 function getPosts(_req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const posts = yield postModel_1.Post.find().exec();
-            // hydrate each post with comments
+            const posts = yield postModel_1.Post.find();
+            // TODO: hydrate w/ comments
             res.status(200).json({ posts });
         }
         catch (err) {
@@ -26,7 +26,8 @@ function getPost(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         if (req.params['postId']) {
             try {
-                const post = postModel_1.Post.findById(req.params['postId']).exec();
+                const post = yield postModel_1.Post.findById(req.params['postId']);
+                // TODO: hydrate w/ comments
                 res.status(200).json({ post });
             }
             catch (err) {
@@ -38,27 +39,63 @@ function getPost(req, res, next) {
 }
 function getUserPosts(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
+        const { userId } = req.params;
+        try {
+            const posts = yield postModel_1.Post.find({ author: userId });
+            res.send({ posts });
+        }
+        catch (err) {
+            next(err);
+        }
     });
 }
 function createPost(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        // validate authenticated
-        // save in db
-        // send response code and return new post
+        const { title, body, author } = req.body;
+        try {
+            const post = yield postModel_1.Post.create({
+                author,
+                title,
+                body,
+            });
+            post.save(function onPostSaved(err) {
+                if (err) {
+                    return next(err);
+                }
+                console.log('New Post saved: ', post);
+                res.send({ post });
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
     });
 }
 function updatePost(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        // validate authenticated
-        // save in db
-        // send response code and return post
+        const { postId } = req.params;
+        const { title, body } = req.body;
+        try {
+            const post = yield postModel_1.Post.findByIdAndUpdate(postId, { title, body }, { returnDocument: 'after' });
+            console.log(`Post ${postId} has been updated: ${post}`);
+            res.sendStatus(200);
+        }
+        catch (err) {
+            next(err);
+        }
     });
 }
 function deletePost(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        // validate authenticated
-        // save in db
-        // send response code and return post
+        const { postId } = req.params;
+        try {
+            yield postModel_1.Post.findByIdAndDelete(postId);
+            console.log(`Post ${postId} has been deleted`);
+            res.sendStatus(200);
+        }
+        catch (err) {
+            next(err);
+        }
     });
 }
 const postController = {

@@ -1,25 +1,52 @@
 import { Request, Response, NextFunction } from "express";
-import { HydratedDocument } from 'mongoose';
-import { IComment, Comment } from "../models/commentModel";
+import { Comment } from "../models/commentModel";
 
-async function getComments(req: Request, res: Response, next: NextFunction): Promise<Array<HydratedDocument<IComment>>> {
+async function getComments(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const { postId } = req.params;
   try {
-        return Comment.find({ postId }).exec();
+    const comments = await Comment.find({ postId });
+    res.send({ comments });
   } catch (err) {
-        next(err);
+      next(err);
   }
 }
 
-async function createComment() {
-
+async function createComment(req: Request, res: Response, next: NextFunction) {
+  const { postId } = req.params;
+  const { body } = req.body;
+  try {
+    const comment = await Comment.create({
+      post: postId,
+      body,
+    });
+    console.log(`Comment added: ${comment}`)
+    res.send({ comment })
+  } catch (err) {
+    next(err);
+  }
 }
 
-async function updateComment() {
-
+async function updateComment(req: Request, res: Response, next: NextFunction) {
+  const { commentId } = req.params;
+  const { body } = req.body;
+  try {
+    const comment = await Comment.findByIdAndUpdate(commentId, { body }, { returnDocument: 'after' })
+    console.log(`Comment ${commentId} has been updated: ${comment}`);
+    res.sendStatus(200);
+  } catch (err) {
+    next(err);
+  }
 }
 
-async function deleteComment() {
-
+async function deleteComment(req: Request, res: Response, next: NextFunction) {
+  const { commentId } = req.params;
+  try {
+    await Comment.findByIdAndDelete(commentId);
+    console.log(`Comment ${commentId} deleted`);
+    res.sendStatus(200);
+  } catch (err) {
+    next(err);
+  }
 }
 
 const commentController = {

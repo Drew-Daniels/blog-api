@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Post = void 0;
 const mongoose_1 = require("mongoose");
 const PostSchema = new mongoose_1.Schema({
-    authorId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' },
+    author: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' },
     title: String,
     body: String,
     isPublished: Boolean,
