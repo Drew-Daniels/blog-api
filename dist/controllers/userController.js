@@ -65,62 +65,47 @@ function createUser(req, res, next) {
         if (userExists) {
             return res.status(409).send({ error: 'A user with that username already exists' });
         }
-        // hash pwd
-        bcryptjs_1.default.genSalt(10, function onSaltGenerated(err, salt) {
-            if (err) {
-                next(err);
-            }
-            bcryptjs_1.default.hash(password, salt, function onHashGenerated(err, hash) {
-                if (err) {
-                    next(err);
-                }
-                // create new user
-                const user = new userModel_1.User({
-                    firstName,
-                    lastName,
-                    username,
-                    hash,
-                });
-                user.save(function onUserSaved(err) {
-                    if (err) {
-                        return next(err);
-                    }
-                    res.send({ user });
-                });
+        try {
+            const salt = yield bcryptjs_1.default.genSalt(10);
+            const hash = yield bcryptjs_1.default.hash(password, salt);
+            const user = new userModel_1.User({
+                firstName,
+                lastName,
+                username,
+                hash,
             });
-        });
+            user.save(function onUserSaved(err) {
+                if (err) {
+                    return next(err);
+                }
+                res.send({ user });
+            });
+        }
+        catch (err) {
+            next(err);
+        }
     });
 }
 function updateUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { userId } = req.params;
         const { firstName, lastName, username, password, isAuthor } = req.body;
-        bcryptjs_1.default.genSalt(10, function onSaltGenerated(err, salt) {
-            if (err) {
-                next(err);
-            }
-            bcryptjs_1.default.hash(password, salt, function onHashGenerated(err, hash) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    if (err) {
-                        next(err);
-                    }
-                    try {
-                        const user = yield userModel_1.User.findByIdAndUpdate(userId, {
-                            firstName,
-                            lastName,
-                            username,
-                            hash,
-                            isAuthor,
-                        });
-                        console.log(`User ${userId} has been updated: ${username} - ${lastName}, ${firstName}`);
-                        res.send({ user });
-                    }
-                    catch (err) {
-                        next(err);
-                    }
-                });
+        try {
+            const salt = yield bcryptjs_1.default.genSalt(10);
+            const hash = yield bcryptjs_1.default.hash(password, salt);
+            const user = yield userModel_1.User.findByIdAndUpdate(userId, {
+                firstName,
+                lastName,
+                username,
+                hash,
+                isAuthor,
             });
-        });
+            console.log(`User ${userId} has been updated: ${username} - ${lastName}, ${firstName}`);
+            res.send({ user });
+        }
+        catch (err) {
+            next(err);
+        }
     });
 }
 function deleteUser(req, res, next) {

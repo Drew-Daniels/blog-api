@@ -45,48 +45,42 @@ async function createUser(req: Request, res: Response, next: NextFunction) {
   if (userExists) {
     return res.status(409).send({ error: 'A user with that username already exists' });
   }
-  // hash pwd
-  bcrypt.genSalt(10, function onSaltGenerated(err, salt) {
-    if (err) { next(err); }
-    bcrypt.hash(password, salt, function onHashGenerated(err, hash) {
-      if (err) { next(err) }
-      // create new user
-      const user = new User({
-        firstName,
-        lastName,
-        username,
-        hash,
-      });
-      user.save(function onUserSaved(err) {
-        if (err) { return next(err); }
-        res.send({ user });
-      });
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    const user = new User({
+      firstName,
+      lastName,
+      username,
+      hash,
     });
-  });
+    user.save(function onUserSaved(err) {
+      if (err) { return next(err); }
+      res.send({ user });
+    });
+  } catch (err) {
+    next(err);
+  }
 }
 
 async function updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { userId } = req.params;
   const { firstName, lastName, username, password, isAuthor } = req.body;
-  bcrypt.genSalt(10, function onSaltGenerated(err, salt) {
-    if (err) { next(err); }
-    bcrypt.hash(password, salt, async function onHashGenerated(err, hash) {
-      if (err) { next(err); }
-      try {
-        const user = await User.findByIdAndUpdate(userId, {
-          firstName,
-          lastName,
-          username,
-          hash,
-          isAuthor,
-        });
-        console.log(`User ${userId} has been updated: ${username} - ${lastName}, ${firstName}`);
-        res.send({ user });
-      } catch (err) {
-        next(err);
-      }
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    const user = await User.findByIdAndUpdate(userId, {
+      firstName,
+      lastName,
+      username,
+      hash,
+      isAuthor,
     });
-  });
+    console.log(`User ${userId} has been updated: ${username} - ${lastName}, ${firstName}`);
+    res.send({ user });
+  } catch (err) {
+    next(err);
+  }
 }
 
 async function deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {

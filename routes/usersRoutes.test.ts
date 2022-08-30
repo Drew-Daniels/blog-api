@@ -34,7 +34,6 @@ beforeEach(async () => {
   const response = await request(app)
     .post('/auth')
     .send(creds)
-  console.log(response);
   token = response.body.token;
 });
 
@@ -54,12 +53,17 @@ describe('GET /api/users', () => {
     request(app)
       .get(ENDPOINT)
       .auth(token, { type: 'bearer' })
-      .expect(401, done);
+      .expect(200, done);
   });
 });
 describe('GET /api/users/:userId', () => {
+  // const ENDPOINT = `/users/${}`;
   describe('returns an error response when: ', () => {
-    test.todo('request is unauthenticated');
+    // test('request is unauthenticated', done => {
+    //   request(app)
+    //     .get(ENDPOINT)
+    //     .send()
+    // });
     test.todo('request is authenticated but userId does not belong to a user in the db');
   });
   describe('returns user when: ', () => {

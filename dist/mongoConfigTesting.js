@@ -37,30 +37,23 @@ function startupMongoServer() {
         // mongoose.connection.once('open', () => {
         //   console.log(`MongoDB successfully connected to ${mongoUri}`);
         // });
-        // move this into a separate function
-        bcryptjs_1.default.genSalt(10, function onSaltGenerated(err, salt) {
-            if (err) {
-                console.log(err);
-            }
-            const { firstName, lastName, username, password } = constants_1.SEED_USER_INFO;
-            bcryptjs_1.default.hash(password, salt, function onHashGenerated(err, hash) {
-                if (err) {
-                    console.log(err);
-                }
-                // create new user
-                const user = new userModel_1.User({
-                    firstName,
-                    lastName,
-                    username,
-                    hash,
-                });
-                user.save(function onUserSaved(err) {
-                    if (err) {
-                        return console.log(err);
-                    }
-                });
+        // TODO: move this into a separate function
+        const { firstName, lastName, username, password } = constants_1.SEED_USER_INFO;
+        try {
+            const salt = yield bcryptjs_1.default.genSalt(10);
+            const hash = yield bcryptjs_1.default.hash(password, salt);
+            const user = new userModel_1.User({
+                firstName,
+                lastName,
+                username,
+                hash,
             });
-        });
+            yield user.save();
+            console.log('Test user created: ', user);
+        }
+        catch (err) {
+            console.log(err);
+        }
     });
 }
 exports.startupMongoServer = startupMongoServer;
