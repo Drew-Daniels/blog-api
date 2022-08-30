@@ -34,9 +34,9 @@ function startupMongoServer() {
             }
             console.log(e);
         });
-        mongoose_1.default.connection.once('open', () => {
-            console.log(`MongoDB successfully connected to ${mongoUri}`);
-        });
+        // mongoose.connection.once('open', () => {
+        //   console.log(`MongoDB successfully connected to ${mongoUri}`);
+        // });
         // move this into a separate function
         bcryptjs_1.default.genSalt(10, function onSaltGenerated(err, salt) {
             if (err) {

@@ -1,7 +1,13 @@
+import dotenv from "dotenv";
+import expander from 'dotenv-expand';
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from 'bcryptjs';
 import passportJwt from 'passport-jwt';
+
+var env = dotenv.config();
+expander.expand(env);
+
 import { IUser, User } from "./models/userModel";
 
 var JwtStrategy = passportJwt.Strategy;

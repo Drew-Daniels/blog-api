@@ -24,9 +24,9 @@ async function startupMongoServer() {
     console.log(e);
   });
 
-  mongoose.connection.once('open', () => {
-    console.log(`MongoDB successfully connected to ${mongoUri}`);
-  });
+  // mongoose.connection.once('open', () => {
+  //   console.log(`MongoDB successfully connected to ${mongoUri}`);
+  // });
   // move this into a separate function
   bcrypt.genSalt(10, function onSaltGenerated(err, salt) {
     if (err) { console.log(err); }

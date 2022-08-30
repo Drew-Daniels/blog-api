@@ -1,6 +1,61 @@
+import express from 'express';
+import dotenv from 'dotenv';
+import expander from 'dotenv-expand'
+import request from 'supertest';
+
+var env = dotenv.config();
+expander.expand(env);
+
+const app = express();
+var PORT = process.env['PORT'];
+
+import { startupMongoServer, shutdownMongoServer } from "../mongoConfigTesting";
+import passport from "../passportConfig";
+import authRouter from "./authRoutes";
+import usersRouter from './usersRoutes';
+import { SEED_USER_INFO, NEW_USER_INFO } from "../constants";
+
+const creds = { username: SEED_USER_INFO.username, password: SEED_USER_INFO.password };
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(passport.initialize());
+
+app.use('/auth', authRouter);
+app.use('/users', passport.authenticate('jwt', { session: false }), usersRouter);
+
+const server = app.listen(() => {
+  console.log(`[server]: Server is running at https://localhost:${PORT}`);
+});
+
+var token: string;
+beforeEach(async () => {
+  await startupMongoServer()
+  const response = await request(app)
+    .post('/auth')
+    .send(creds)
+  console.log(response);
+  token = response.body.token;
+});
+
+afterEach(async () => {
+  await shutdownMongoServer();
+  server.close();
+});
+
 describe('GET /api/users', () => {
-  test.todo('returns an error response when request is unauthenticated');
-  test.todo('returns all users when request is authenticated');
+  const ENDPOINT = '/users';
+  test('returns an error response when request is unauthenticated', done => {
+    request(app)
+      .get(ENDPOINT)
+      .expect(401, done);
+  });
+  test('returns all users when request is authenticated', done => {
+    request(app)
+      .get(ENDPOINT)
+      .auth(token, { type: 'bearer' })
+      .expect(401, done);
+  });
 });
 describe('GET /api/users/:userId', () => {
   describe('returns an error response when: ', () => {
