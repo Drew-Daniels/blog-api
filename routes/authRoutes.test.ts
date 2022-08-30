@@ -19,19 +19,16 @@ app.use(passport.initialize());
 
 app.use('/', authRouter);
 
-app.listen(PORT, () => {
+app.listen(() => {
   console.log(`[server]: Server is running at https://localhost:${PORT}`);
 });
 
 beforeAll(async () => {
   await startupMongoServer();
-  // create collections
-
 });
 
 afterAll(async () => {
   await shutdownMongoServer();
-
 });
 
 describe('POST "api/auth"', () => {
@@ -39,20 +36,23 @@ describe('POST "api/auth"', () => {
     test('username provided does not match a registered user', done => {
       request(app)
         .post('/')
-        .set('Accept', 'application/json')
-        .expect('Content-Type', '/json/')
-        .expect({ username: 'bob@dobbs.com', password: '6JtxHvbnAh$@V9AM' })
+        // missing last character in username
+        .send({ username: 'bob@dobbs.com', password: '6JtxHvbnAh$@V9AM' })
         .expect(401, done);
     });
-    test.todo('password provided does not match a registered user');
+    test('password provided does not match a registered user', done => {
+      request(app)
+        .post('/')
+        // missing last character in pwd
+        .send({ username: 'bob@dobbs.comz', password: '6JtxHvbnAh$@V9A' })
+        .expect(401, done);
+    });
   });
   describe('returns authenticated user w/ token when: ', () => {
     test('registered user provides correct credentials', done => {
       request(app)
         .post('/')
-        .set('Accept', 'application/json')
-        .expect('Content-Type', '/json/')
-        .expect({ username: 'bob@dobbs.comz', password: '6JtxHvbnAh$@V9AM' })
+        .send({ username: 'bob@dobbs.comz', password: '6JtxHvbnAh$@V9AM' })
         .expect(200, done);
     });
   });
