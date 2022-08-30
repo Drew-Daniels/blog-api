@@ -3,6 +3,7 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import bcrypt from 'bcryptjs';
 
 import { User } from "./models/userModel";
+import { SEED_USER_INFO } from './constants';
 
 var mongoServer: MongoMemoryServer;
 
@@ -27,15 +28,9 @@ async function startupMongoServer() {
     console.log(`MongoDB successfully connected to ${mongoUri}`);
   });
   // move this into a separate function
-  const testUserInfo = {
-    firstName: 'bob',
-    lastName: 'dobbs',
-    username: 'bob@dobbs.comz',
-    password: '6JtxHvbnAh$@V9AM',
-  }
   bcrypt.genSalt(10, function onSaltGenerated(err, salt) {
     if (err) { console.log(err); }
-    const { firstName, lastName, username, password } = testUserInfo;
+    const { firstName, lastName, username, password } = SEED_USER_INFO;
     bcrypt.hash(password, salt, function onHashGenerated(err, hash) {
       if (err) { console.log(err) }
       // create new user
@@ -47,7 +42,6 @@ async function startupMongoServer() {
       });
       user.save(function onUserSaved(err) {
         if (err) { return console.log(err); }
-        console.log('Test user created: ', user);
       });
     });
   });

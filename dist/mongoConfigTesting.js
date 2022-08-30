@@ -17,6 +17,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const mongodb_memory_server_1 = require("mongodb-memory-server");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userModel_1 = require("./models/userModel");
+const constants_1 = require("./constants");
 var mongoServer;
 function startupMongoServer() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -37,17 +38,11 @@ function startupMongoServer() {
             console.log(`MongoDB successfully connected to ${mongoUri}`);
         });
         // move this into a separate function
-        const testUserInfo = {
-            firstName: 'bob',
-            lastName: 'dobbs',
-            username: 'bob@dobbs.comz',
-            password: '6JtxHvbnAh$@V9AM',
-        };
         bcryptjs_1.default.genSalt(10, function onSaltGenerated(err, salt) {
             if (err) {
                 console.log(err);
             }
-            const { firstName, lastName, username, password } = testUserInfo;
+            const { firstName, lastName, username, password } = constants_1.SEED_USER_INFO;
             bcryptjs_1.default.hash(password, salt, function onHashGenerated(err, hash) {
                 if (err) {
                     console.log(err);
@@ -63,7 +58,6 @@ function startupMongoServer() {
                     if (err) {
                         return console.log(err);
                     }
-                    console.log('Test user created: ', user);
                 });
             });
         });

@@ -39,12 +39,11 @@ async function getUserPosts(req: Request, res: Response, next: NextFunction): Pr
   }
 }
 
-async function createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+async function createUser(req: Request, res: Response, next: NextFunction) {
   const { firstName, lastName, username, password } = req.body;
   const userExists = !!await User.count({ username });
   if (userExists) {
-    console.log('here')
-    res.status(409).send({ error: 'A user with that username already exists' });
+    return res.status(409).send({ error: 'A user with that username already exists' });
   }
   // hash pwd
   bcrypt.genSalt(10, function onSaltGenerated(err, salt) {
