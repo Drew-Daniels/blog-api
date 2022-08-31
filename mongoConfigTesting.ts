@@ -3,6 +3,7 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import bcrypt from 'bcryptjs';
 
 import { User } from "./models/userModel";
+import { Post } from "./models/postModel";
 import { SEED_USER_INFO } from './constants';
 
 var mongoServer: MongoMemoryServer;
@@ -25,6 +26,7 @@ async function startupMongoServer() {
   });
   const { firstName, lastName, username, password } = SEED_USER_INFO;
   try {
+    // seed one user
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
     const user = new User({
@@ -34,6 +36,13 @@ async function startupMongoServer() {
       hash,
     });
     await user.save();
+    // seed one post by seeded user
+    const post = new Post({
+      author: user,
+      title: 'First post title!',
+      body: 'First post body!',
+    });
+    await post.save();
     return user.id;
   } catch (err) {
     console.log(err);

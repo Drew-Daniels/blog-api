@@ -17,6 +17,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const mongodb_memory_server_1 = require("mongodb-memory-server");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userModel_1 = require("./models/userModel");
+const postModel_1 = require("./models/postModel");
 const constants_1 = require("./constants");
 var mongoServer;
 function startupMongoServer() {
@@ -36,6 +37,7 @@ function startupMongoServer() {
         });
         const { firstName, lastName, username, password } = constants_1.SEED_USER_INFO;
         try {
+            // seed one user
             const salt = yield bcryptjs_1.default.genSalt(10);
             const hash = yield bcryptjs_1.default.hash(password, salt);
             const user = new userModel_1.User({
@@ -45,6 +47,13 @@ function startupMongoServer() {
                 hash,
             });
             yield user.save();
+            // seed one post by seeded user
+            const post = new postModel_1.Post({
+                author: user,
+                title: 'First post title!',
+                body: 'First post body!',
+            });
+            yield post.save();
             return user.id;
         }
         catch (err) {

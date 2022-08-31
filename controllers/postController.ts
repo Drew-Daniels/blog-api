@@ -54,6 +54,7 @@ async function getUserPosts(req: Request, res: Response, next: NextFunction) {
 }
 
 async function createPost(req: Request, res: Response, next: NextFunction): Promise<void> {
+  console.log('req.body: ', req.body);
   const { title, body } = req.body;
   try {
     const post = await Post.create({

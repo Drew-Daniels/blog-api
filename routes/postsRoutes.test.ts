@@ -1,30 +1,125 @@
+import express from 'express';
+import dotenv from 'dotenv';
+import expander from 'dotenv-expand'
+import request from 'supertest';
+
+var env = dotenv.config();
+expander.expand(env);
+
+const app = express();
+var PORT = process.env['PORT'];
+
+import { startupMongoServer, shutdownMongoServer } from "../mongoConfigTesting";
+import passport from "../passportConfig";
+import authRouter from "./authRoutes";
+import postsRouter from "./postsRoutes";
+import { SEED_USER_INFO, NEW_POST_INFO } from "../constants";
+
+const creds = { username: SEED_USER_INFO.username, password: SEED_USER_INFO.password };
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(passport.initialize());
+
+app.use('/auth', authRouter);
+app.use('/posts', passport.authenticate('jwt', { session: false }), postsRouter);
+
+const server = app.listen(() => {
+  console.log(`[server]: Server is running at https://localhost:${PORT}`);
+});
+
+var token: string;
+var userId;
+beforeEach(async () => {
+  userId = await startupMongoServer();
+  const response = await request(app)
+    .post('/auth')
+    .send(creds)
+  token = response.body.token;
+});
+
+afterEach(async () => {
+  await shutdownMongoServer();
+  server.close();
+});
+
 describe('GET "api/posts"', () => {
-  describe('returns an error response when: ', () => {
-    test.todo('request is unauthenticated');
+  test('returns an error response when request is unauthenticated', done => {
+    request(app)
+      .get('/posts')
+      .expect(401, done);
   });
-  describe('returns all posts when: ', () => {
-    test.todo('request is authenticated');
+  test('returns all posts when request is authenticated', done => {
+    request(app)
+      .get('/posts')
+      .auth(token, { type: 'bearer' })
+      .expect(200, done);
   });
 });
 describe('POST "api/posts"', () => {
   describe('returns an error response when: ', () => {
-    describe('request is: ', () => {
-      test.todo('unauthenticated');
+    test('request is unauthenticated', done => {
+      request(app)
+        .post('/posts')
+        .send(NEW_POST_INFO)
+        .expect(401, done);
     });
-    describe('title is: ', () => {
-      test.todo('undefined');
-      test.todo('a blank string');
-      test.todo('greater than 100 characters');
+    describe('request is authenticated, but title is: ', () => {
+      test('undefined', done => {
+        request(app)
+          .post('/posts')
+          .auth(token, { type: 'bearer' })
+          .send({ ...NEW_POST_INFO, title: undefined })
+          .expect(400, done);
+      });
+      test('a blank string', done => {
+        request(app)
+          .post('/posts')
+          .auth(token, { type: 'bearer' })
+          .send({ ...NEW_POST_INFO, title: '' })
+          .expect(400, done);
+      });
+      test('greater than 100 characters', done => {
+        request(app)
+          .post('/posts')
+          .auth(token, { type: 'bearer' })
+          .send({ ...NEW_POST_INFO, title: 'y08vKU0RkDQSuOxE1UIeViK695gdpptYadXOTP1zHR65kvMreADA8Kv00F7Axrs80t7Pvajhrtauq5e26c6aYmy6WqMgkHc5Za01j' })
+          .expect(400, done);
+      });
     });
-    describe('body is: ', () => {
-      test.todo('undefined');
-      test.todo('a blank string');
-      test.todo('greater than 300 characters');
+    describe('request is authenticated, but body is: ', () => {
+      test('undefined', done => {
+        request(app)
+          .post('/posts')
+          .auth(token, { type: 'bearer' })
+          .send({ ...NEW_POST_INFO, body: undefined })
+          .expect(400, done);
+      });
+      test('a blank string', done => {
+        request(app)
+          .post('/posts')
+          .auth(token, { type: 'bearer' })
+          .send({ ...NEW_POST_INFO, body: '' })
+          .expect(400, done);
+      });
+      test('greater than 300 characters', done => {
+        request(app)
+          .post('/posts')
+          .auth(token, { type: 'bearer' })
+          .send({ ...NEW_POST_INFO, body: 'ty9SFTcbYGAH9TurIuER5AQ0LUh9u3Mk56A76SpQ5pJWop6MqjkE9nCsokgJIfqsvPB1CmQV5v4X7o6xyEaUwqCDGl6W44looYlt2Iqop4RpEWRow63H8ozzbtaRcNGUaRiUVB7pgCADzqOpn1ENKoM8UVr4aZjjONPW1Tn6HTA2SrgghXR8XQQ9YztDARGuJ5rXZaJ5byFvlnI830l360kegGboHtZPQZaTUfyiiw9oLFwEHhxicNb7KzCebdB5j7QT6BETgmAve8LdfT8Wr0C6R7Bw07byDM6aQWNYwezGj' })
+          .expect(400, done);
+      });
     });
   });
-  describe('creates and returns a new post when: ', () => {
-    test.todo('request is authenticated, and title and body meet requirements');
-  });
+  describe('returns a success response when: ', () => {
+    test('creates and returns a new post when request is authenticated, and title and body meet requirements', done => {
+      request(app)
+        .post('/posts')
+        .auth(token, { type: 'bearer' })
+        .send(NEW_POST_INFO)
+        .expect(200, done);
+    });
+  })
 });
 describe('GET "api/posts/:postId"', () => {
   describe('returns an error response when: ', () => {
