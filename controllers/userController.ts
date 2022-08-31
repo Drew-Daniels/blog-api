@@ -73,8 +73,11 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-async function deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+async function deleteUser(req: Request, res: Response, next: NextFunction) {
   const { userId } = req.params;
+  if (!ObjectId.isValid(userId)) return res.sendStatus(400);
+  const userExists = await User.findById(userId);
+  if (!userExists) return res.sendStatus(404);
   try {
     await User.findByIdAndDelete(userId);
     console.log(`User ${userId} has been deleted`);

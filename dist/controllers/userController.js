@@ -104,6 +104,11 @@ function updateUser(req, res, next) {
 function deleteUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { userId } = req.params;
+        if (!mongodb_1.ObjectId.isValid(userId))
+            return res.sendStatus(400);
+        const userExists = yield userModel_1.User.findById(userId);
+        if (!userExists)
+            return res.sendStatus(404);
         try {
             yield userModel_1.User.findByIdAndDelete(userId);
             console.log(`User ${userId} has been deleted`);

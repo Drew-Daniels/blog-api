@@ -168,36 +168,46 @@ describe('PUT /api/users/:userId', () => {
             });
         });
         describe('password is: ', () => {
-            test.todo('not a strong password');
+            test('not a strong password', done => {
+                (0, supertest_1.default)(app)
+                    .put('/users/' + userId)
+                    .auth(token, { type: 'bearer' })
+                    .send(Object.assign(Object.assign({}, constants_1.UPDATED_USER_INFO), { password: 'weak' }))
+                    .expect(400, done);
+            });
         });
         describe('passwordConfirm is: ', () => {
-            test.todo('different from password');
+            test('different from password', done => {
+                (0, supertest_1.default)(app)
+                    .put('/users/' + userId)
+                    .auth(token, { type: 'bearer' })
+                    .send(Object.assign(Object.assign({}, constants_1.UPDATED_USER_INFO), { password: constants_1.UPDATED_USER_INFO.password.slice(-1) }))
+                    .expect(400, done);
+            });
         });
     });
     describe('returns an updated user when: ', () => {
         describe('firstName is: ', () => {
-            test.todo('a 1 character string');
-            test.todo('a string between 1 and 30 characters');
-            test.todo('a 30 character string');
-        });
-        describe('lastName is: ', () => {
-            test.todo('1 character string');
-            test.todo('string between 1 and 30 characters');
-            test.todo('30 character string');
-        });
-        describe('username is: ', () => {
-            test.todo('an email');
-            test.todo('available');
-        });
-        describe('password is: ', () => {
-            test.todo('strong password');
-        });
-        describe('passwordConfirm is: ', () => {
-            test.todo('same as password');
+            test('firstName and lastName are between 1 and 30 characters, username is an available email, password is strong, and password confirm matches password', done => {
+                (0, supertest_1.default)(app)
+                    .put('/users/' + userId)
+                    .auth(token, { type: 'bearer' })
+                    .send(Object.assign({}, constants_1.UPDATED_USER_INFO))
+                    .expect(200, done);
+            });
         });
     });
 });
 describe('DELETE /api/users/:userId', () => {
+    describe('returns an error response when: ', () => {
+        test.todo('returns an error response when userId is not a valid ObjectId');
+        test.todo('returns an error response when ');
+    });
+    test.todo('deletes a user with an id matching userId when userId is a valid ObjectId and matches a document in db');
 });
 describe('GET /api/users/:userId/posts', () => {
+    describe('returns an error response when: ', () => {
+    });
+    describe('returns an array of a given user\'s posts when userId is valid ObjectId and matches a document in db', () => {
+    });
 });
