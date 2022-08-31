@@ -13,7 +13,7 @@ import { startupMongoServer, shutdownMongoServer } from "../mongoConfigTesting";
 import passport from "../passportConfig";
 import authRouter from "./authRoutes";
 import usersRouter from './usersRoutes';
-import {SEED_USER_INFO, NEW_USER_INFO, UPDATED_USER_INFO} from "../constants";
+import { SEED_USER_INFO, UPDATED_USER_INFO } from "../constants";
 
 const creds = { username: SEED_USER_INFO.username, password: SEED_USER_INFO.password };
 
@@ -223,9 +223,11 @@ describe('DELETE /api/users/:userId', () => {
 });
 describe('GET /api/users/:userId/posts', () => {
   describe('returns an error response when: ', () => {
-
+    test.todo('request is not authenticated');
+    test.todo('request is authenticated, but userId is not a valid ObjectId');
+    test.todo('request is authenticated, and userId is valid ObjectId, but cannot be found in document in db');
   });
   describe('returns an array of a given user\'s posts when userId is valid ObjectId and matches a document in db', () => {
-
+    test.todo('request is authenticated, and userId matches document in db');
   });
 });
