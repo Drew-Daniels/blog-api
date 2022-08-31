@@ -11,6 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const postModel_1 = require("../models/postModel");
 const commentModel_1 = require("../models/commentModel");
+const mongodb_1 = require("mongodb");
+const userModel_1 = require("../models/userModel");
 function getPosts(_req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -47,6 +49,11 @@ function getPost(req, res, next) {
 function getUserPosts(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { userId } = req.params;
+        if (!mongodb_1.ObjectId.isValid(req.params['userId']))
+            return res.sendStatus(400); // invalid BSON string
+        const userExists = yield userModel_1.User.findById(userId);
+        if (!userExists)
+            return res.sendStatus(404);
         try {
             const posts = yield postModel_1.Post.find({ author: userId });
             res.send({ posts });

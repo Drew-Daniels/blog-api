@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { Types } from "mongoose";
 import { IPost, Post } from '../models/postModel';
 import { IComment, Comment } from '../models/commentModel';
+import {ObjectId} from "mongodb";
+import {User} from "../models/userModel";
 
 interface ILeanPost extends IPost {
   _id: Types.ObjectId;
@@ -38,8 +40,11 @@ async function getPost(req: Request, res: Response, next: NextFunction): Promise
   res.status(400).end();
 }
 
-async function getUserPosts(req: Request, res: Response, next: NextFunction): Promise<void> {
+async function getUserPosts(req: Request, res: Response, next: NextFunction) {
   const { userId } = req.params;
+  if (!ObjectId.isValid(req.params['userId'])) return res.sendStatus(400); // invalid BSON string
+  const userExists = await User.findById(userId);
+  if (!userExists) return res.sendStatus(404);
   try {
     const posts = await Post.find({ author: userId });
     res.send({ posts });

@@ -223,9 +223,23 @@ describe('DELETE /api/users/:userId', () => {
 });
 describe('GET /api/users/:userId/posts', () => {
   describe('returns an error response when: ', () => {
-    test.todo('request is not authenticated');
-    test.todo('request is authenticated, but userId is not a valid ObjectId');
-    test.todo('request is authenticated, and userId is valid ObjectId, but cannot be found in document in db');
+    test('request is not authenticated', done => {
+      request(app)
+        .get('/users/' + userId + '/posts')
+        .expect(401, done);
+    });
+    test('request is authenticated, but userId is not a valid ObjectId', done => {
+      request(app)
+        .get('/users/' + '630eaf711a7937a1a037d1cg' + '/posts')
+        .auth(token, { type: 'bearer' })
+        .expect(400, done);
+    });
+    test('request is authenticated, and userId is valid ObjectId, but cannot be found in document in db', done => {
+      request(app)
+        .get('/users/' + userId + '/posts')
+        .auth(token, { type: 'bearer' })
+        .expect(200, done);
+    });
   });
   describe('returns an array of a given user\'s posts when userId is valid ObjectId and matches a document in db', () => {
     test.todo('request is authenticated, and userId matches document in db');
