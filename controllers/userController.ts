@@ -50,10 +50,12 @@ async function createUser(req: Request, res: Response, next: NextFunction) {
 
 async function updateUser(req: Request, res: Response, next: NextFunction) {
   const { userId } = req.params;
-  if (!ObjectId.isValid(userId)) { return res.sendStatus(400); }
-  const userExists = !! await User.findById(userId);
-  if (!userExists) { return res.sendStatus(404); }
+  if (!ObjectId.isValid(userId)) return res.sendStatus(400);
+  const userExists = await User.findById(userId);
+  if (!userExists) return res.sendStatus(404);
   const { firstName, lastName, username, password, isAuthor } = req.body;
+  const usernameTaken = !! await User.count({ username });
+  if (usernameTaken) { return res.sendStatus(409); }
   try {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);

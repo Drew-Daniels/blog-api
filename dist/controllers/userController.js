@@ -73,14 +73,16 @@ function createUser(req, res, next) {
 function updateUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { userId } = req.params;
-        if (!mongodb_1.ObjectId.isValid(userId)) {
+        if (!mongodb_1.ObjectId.isValid(userId))
             return res.sendStatus(400);
-        }
-        const userExists = !!(yield userModel_1.User.findById(userId));
-        if (!userExists) {
+        const userExists = yield userModel_1.User.findById(userId);
+        if (!userExists)
             return res.sendStatus(404);
-        }
         const { firstName, lastName, username, password, isAuthor } = req.body;
+        const usernameTaken = !!(yield userModel_1.User.count({ username }));
+        if (usernameTaken) {
+            return res.sendStatus(409);
+        }
         try {
             const salt = yield bcryptjs_1.default.genSalt(10);
             const hash = yield bcryptjs_1.default.hash(password, salt);

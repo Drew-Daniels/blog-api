@@ -155,7 +155,13 @@ describe('PUT /api/users/:userId', () => {
           .send({ ...UPDATED_USER_INFO, username: 'sYJys99JeIDaDoBhQAjmQdXUNSdkInj' })
           .expect(400, done);
       });
-      test.todo('not available');
+      test('not available', done => {
+        request(app)
+          .put('/users/' + userId)
+          .auth(token, { type: 'bearer' })
+          .send({ ...UPDATED_USER_INFO, username: SEED_USER_INFO.username })
+          .expect(409, done);
+      });
     });
     describe('password is: ', () => {
       test.todo('not a strong password');

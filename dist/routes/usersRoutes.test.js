@@ -159,7 +159,13 @@ describe('PUT /api/users/:userId', () => {
                     .send(Object.assign(Object.assign({}, constants_1.UPDATED_USER_INFO), { username: 'sYJys99JeIDaDoBhQAjmQdXUNSdkInj' }))
                     .expect(400, done);
             });
-            test.todo('not available');
+            test('not available', done => {
+                (0, supertest_1.default)(app)
+                    .put('/users/' + userId)
+                    .auth(token, { type: 'bearer' })
+                    .send(Object.assign(Object.assign({}, constants_1.UPDATED_USER_INFO), { username: constants_1.SEED_USER_INFO.username }))
+                    .expect(409, done);
+            });
         });
         describe('password is: ', () => {
             test.todo('not a strong password');
