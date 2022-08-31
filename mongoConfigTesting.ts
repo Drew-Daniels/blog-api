@@ -43,7 +43,7 @@ async function startupMongoServer() {
       body: 'First post body!',
     });
     await post.save();
-    return user.id;
+    return { seedUserId:  user.id, seedPostId: post.id };
   } catch (err) {
     console.log(err);
   }

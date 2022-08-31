@@ -54,7 +54,7 @@ function startupMongoServer() {
                 body: 'First post body!',
             });
             yield post.save();
-            return user.id;
+            return { seedUserId: user.id, seedPostId: post.id };
         }
         catch (err) {
             console.log(err);

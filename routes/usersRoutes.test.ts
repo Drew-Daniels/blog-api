@@ -31,7 +31,8 @@ const server = app.listen(() => {
 var token: string;
 var userId;
 beforeEach(async () => {
-  userId = await startupMongoServer();
+  const seedInfo = await startupMongoServer();
+  userId = seedInfo.seedUserId;
   const response = await request(app)
     .post('/auth')
     .send(creds)

@@ -36,8 +36,11 @@ const server = app.listen(() => {
 });
 var token;
 var userId;
+var postId;
 beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
-    userId = yield (0, mongoConfigTesting_1.startupMongoServer)();
+    const seedInfo = yield (0, mongoConfigTesting_1.startupMongoServer)();
+    userId = seedInfo.seedUserId;
+    postId = seedInfo.seedPostId;
     const response = yield (0, supertest_1.default)(app)
         .post('/auth')
         .send(creds);
@@ -127,7 +130,11 @@ describe('POST "api/posts"', () => {
 });
 describe('GET "api/posts/:postId"', () => {
     describe('returns an error response when: ', () => {
-        test.todo('request is unauthenticated');
+        test('request is unauthenticated', done => {
+            (0, supertest_1.default)(app)
+                .get('/posts/' + postId)
+                .expect(401, done);
+        });
         test.todo('request is authenticated but postId does not belong to a post in the db');
     });
     describe('returns a post when: ', () => {

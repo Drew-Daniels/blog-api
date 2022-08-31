@@ -37,7 +37,8 @@ const server = app.listen(() => {
 var token;
 var userId;
 beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
-    userId = yield (0, mongoConfigTesting_1.startupMongoServer)();
+    const seedInfo = yield (0, mongoConfigTesting_1.startupMongoServer)();
+    userId = seedInfo.seedUserId;
     const response = yield (0, supertest_1.default)(app)
         .post('/auth')
         .send(creds);
