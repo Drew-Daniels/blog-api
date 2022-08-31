@@ -240,12 +240,17 @@ describe('GET /api/users/:userId/posts', () => {
         });
         test('request is authenticated, and userId is valid ObjectId, but cannot be found in document in db', done => {
             (0, supertest_1.default)(app)
+                .get('/users/' + '630eaf711a7937a1a037d1cd' + '/posts')
+                .auth(token, { type: 'bearer' })
+                .expect(404, done);
+        });
+    });
+    describe('returns an array of a given user\'s posts when userId is valid ObjectId and matches a document in db', () => {
+        test('request is authenticated, and userId matches document in db', done => {
+            (0, supertest_1.default)(app)
                 .get('/users/' + userId + '/posts')
                 .auth(token, { type: 'bearer' })
                 .expect(200, done);
         });
-    });
-    describe('returns an array of a given user\'s posts when userId is valid ObjectId and matches a document in db', () => {
-        test.todo('request is authenticated, and userId matches document in db');
     });
 });
