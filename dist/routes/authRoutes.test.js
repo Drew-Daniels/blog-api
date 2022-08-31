@@ -75,20 +75,6 @@ describe('POST "api/auth/signup"', () => {
     const ENDPOINT = '/signup';
     describe('returns an error response when: ', () => {
         describe('firstName is: ', () => {
-            test('undefined', done => {
-                const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { firstName: undefined });
-                (0, supertest_1.default)(app)
-                    .post(ENDPOINT)
-                    .send(body)
-                    .expect(400, done);
-            });
-            test('not a string', done => {
-                const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { firstName: 4 });
-                (0, supertest_1.default)(app)
-                    .post(ENDPOINT)
-                    .send(body)
-                    .expect(400, done);
-            });
             test('empty string', done => {
                 const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { firstName: '' });
                 (0, supertest_1.default)(app)
@@ -97,7 +83,7 @@ describe('POST "api/auth/signup"', () => {
                     .expect(400, done);
             });
             test('greater than 30 characters', done => {
-                const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { firstName: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar lectus ante, nec sollicitudin orci sagittis non. Nulla vehicula euismod finibus. Aliquam sed nibh justo. Proin blandit vestibulum arcu, nec fermentum.' });
+                const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { firstName: 'sYJys99JeIDaDoBhQAjmQdXUNSdkInjn' });
                 (0, supertest_1.default)(app)
                     .post(ENDPOINT)
                     .send(body)
@@ -105,20 +91,6 @@ describe('POST "api/auth/signup"', () => {
             });
         });
         describe('lastName is: ', () => {
-            test('undefined', done => {
-                const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { lastName: undefined });
-                (0, supertest_1.default)(app)
-                    .post(ENDPOINT)
-                    .send(body)
-                    .expect(400, done);
-            });
-            test('not a string', done => {
-                const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { lastName: 4 });
-                (0, supertest_1.default)(app)
-                    .post(ENDPOINT)
-                    .send(body)
-                    .expect(400, done);
-            });
             test('empty string', done => {
                 const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { lastName: '' });
                 (0, supertest_1.default)(app)
@@ -127,7 +99,7 @@ describe('POST "api/auth/signup"', () => {
                     .expect(400, done);
             });
             test('greater than 30 characters', done => {
-                const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { lastName: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar lectus ante, nec sollicitudin orci sagittis non. Nulla vehicula euismod finibus. Aliquam sed nibh justo. Proin blandit vestibulum arcu, nec fermentum.' });
+                const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { lastName: 'sYJys99JeIDaDoBhQAjmQdXUNSdkInjn' });
                 (0, supertest_1.default)(app)
                     .post(ENDPOINT)
                     .send(body)
@@ -135,13 +107,6 @@ describe('POST "api/auth/signup"', () => {
             });
         });
         describe('username is: ', () => {
-            test('undefined', done => {
-                const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { username: undefined });
-                (0, supertest_1.default)(app)
-                    .post(ENDPOINT)
-                    .send(body)
-                    .expect(400, done);
-            });
             test('not an email', done => {
                 const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { username: 'notanemail' });
                 (0, supertest_1.default)(app)
@@ -150,7 +115,7 @@ describe('POST "api/auth/signup"', () => {
                     .expect(400, done);
             });
             test('greater than 30 characters', done => {
-                const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { username: 'thisisanemailthatiswaylongerthan30charactersandshouldbeconsidredinvalid@gmail.com' });
+                const body = Object.assign(Object.assign({}, constants_1.SEED_USER_INFO), { username: 'sYJys99JeIDaDoBhQAjmQdXUNSdkInjn' });
                 (0, supertest_1.default)(app)
                     .post(ENDPOINT)
                     .send(body)

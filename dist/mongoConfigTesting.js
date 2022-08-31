@@ -34,10 +34,6 @@ function startupMongoServer() {
             }
             console.log(e);
         });
-        // mongoose.connection.once('open', () => {
-        //   console.log(`MongoDB successfully connected to ${mongoUri}`);
-        // });
-        // TODO: move this into a separate function
         const { firstName, lastName, username, password } = constants_1.SEED_USER_INFO;
         try {
             const salt = yield bcryptjs_1.default.genSalt(10);
@@ -49,7 +45,7 @@ function startupMongoServer() {
                 hash,
             });
             yield user.save();
-            console.log('Test user created: ', user);
+            return user.id;
         }
         catch (err) {
             console.log(err);

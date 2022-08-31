@@ -13,7 +13,7 @@ import { startupMongoServer, shutdownMongoServer } from "../mongoConfigTesting";
 import passport from "../passportConfig";
 import authRouter from "./authRoutes";
 import usersRouter from './usersRoutes';
-import { SEED_USER_INFO, NEW_USER_INFO } from "../constants";
+import {SEED_USER_INFO, NEW_USER_INFO, UPDATED_USER_INFO} from "../constants";
 
 const creds = { username: SEED_USER_INFO.username, password: SEED_USER_INFO.password };
 
@@ -29,8 +29,9 @@ const server = app.listen(() => {
 });
 
 var token: string;
+var userId;
 beforeEach(async () => {
-  await startupMongoServer()
+  userId = await startupMongoServer();
   const response = await request(app)
     .post('/auth')
     .send(creds)
@@ -57,39 +58,103 @@ describe('GET /api/users', () => {
   });
 });
 describe('GET /api/users/:userId', () => {
-  // const ENDPOINT = `/users/${}`;
   describe('returns an error response when: ', () => {
-    // test('request is unauthenticated', done => {
-    //   request(app)
-    //     .get(ENDPOINT)
-    //     .send()
-    // });
-    test.todo('request is authenticated but userId does not belong to a user in the db');
+    test('request is unauthenticated', done => {
+      request(app)
+        .get('/users/' + userId)
+        .expect(401, done);
+    });
+    test('request is authenticated but userId provided cannot be parsed as BSON id', done => {
+      request(app)
+        .get('/users/' + '630eaf711a7937a1a037d1cg')// only characters 0-9 and a-f
+        .auth(token, { type: 'bearer' })
+        .expect(400, done);
+    });
+    test('request is authenticated but userId does not belong to a user in the db', done => {
+      request(app)
+        .get('/users/' + '630eaf711a7937a1a037d1cd')
+        .auth(token, { type: 'bearer' })
+        .expect(404, done);
+    });
   });
   describe('returns user when: ', () => {
-    test.todo('request is authenticated and userId belongs to a user in the db');
+    test('request is authenticated and userId belongs to a user in the db', done => {
+      request(app)
+        .get('/users/' + userId)
+        .auth(token, { type: 'bearer' })
+        .expect(200, done);
+    });
   });
 });
 describe('PUT /api/users/:userId', () => {
   describe('returns an error response when: ', () => {
-    test.todo('request is unauthenticated');
-    test.todo('userId does not belong to a user in the db');
+    test('request is unauthenticated', done => {
+      request(app)
+        .put('/users/' + userId)
+        .send(UPDATED_USER_INFO)
+        .expect(401, done);
+    });
+    test('request is authenticated but userId provided cannot be parsed as BSON id', done => {
+      request(app)
+        .put('/users/' + '630eaf711a7937a1a037d1cg')
+        .auth(token, { type: 'bearer' })
+        .send(UPDATED_USER_INFO)
+        .expect(400, done);
+    });
+    test('request is authenticated, userId is valid ObjectId, but userId does not belong to a user in the db', done => {
+      request(app)
+        .put('/users/' + '630eaf711a7937a1a037d1cd')
+        .auth(token, { type: 'bearer' })
+        .send(UPDATED_USER_INFO)
+        .expect(404, done);
+    });
     describe('firstName is: ', () => {
-      test.todo('undefined');
-      test.todo('not a string');
-      test.todo('empty string');
-      test.todo('greater than 30 characters');
+      test('empty string', done => {
+        request(app)
+          .put('/users/' + userId)
+          .auth(token, { type: 'bearer' })
+          .send({ ...UPDATED_USER_INFO, firstName: '' })
+          .expect(400, done);
+      });
+      test('greater than 30 characters', done => {
+        request(app)
+          .put('/users/' + userId)
+          .auth(token, { type: 'bearer' })
+          .send({ ...UPDATED_USER_INFO, firstName: 'sYJys99JeIDaDoBhQAjmQdXUNSdkInj' })
+          .expect(400, done);
+      });
     });
     describe('lastName is: ', () => {
-      test.todo('undefined');
-      test.todo('not a string');
-      test.todo('empty string');
-      test.todo('greater than 30 characters');
+      test('empty string', done => {
+        request(app)
+          .put('/users/' + userId)
+          .auth(token, { type: 'bearer' })
+          .send({ ...UPDATED_USER_INFO, lastName: '' })
+          .expect(400, done);
+      });
+      test('greater than 30 characters', done => {
+        request(app)
+          .put('/users/' + userId)
+          .auth(token, { type: 'bearer' })
+          .send({ ...UPDATED_USER_INFO, lastName: 'sYJys99JeIDaDoBhQAjmQdXUNSdkInj' })
+          .expect(400, done);
+      });
     });
     describe('username is: ', () => {
-      test.todo('undefined');
-      test.todo('not an email')
-      test.todo('greater than 30 characters');
+      test('not an email', done => {
+        request(app)
+          .put('/users/' + userId)
+          .auth(token, { type: 'bearer' })
+          .send({ ...UPDATED_USER_INFO, username: 'notanemail' })
+          .expect(400, done);
+      });
+      test('greater than 30 characters', done => {
+        request(app)
+          .put('/users/' + userId)
+          .auth(token, { type: 'bearer' })
+          .send({ ...UPDATED_USER_INFO, username: 'sYJys99JeIDaDoBhQAjmQdXUNSdkInj' })
+          .expect(400, done);
+      });
       test.todo('not available');
     });
     describe('password is: ', () => {

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 
 import { User } from '../models/userModel';
-import { Post } from "../models/postModel";
+import { ObjectId } from 'mongodb';
 
 async function getUsers(_req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -13,29 +13,14 @@ async function getUsers(_req: Request, res: Response, next: NextFunction): Promi
   }
 }
 
-async function getUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-  if (req.params["userId"]) {
-    try {
-      const user = await User.findById(req.params["userId"]);
-      res.send({ user });
-    } catch (err) {
-      next(err);
-    }
-  } else {
-    res.sendStatus(400);
-  }
-}
-
-async function getUserPosts(req: Request, res: Response, next: NextFunction): Promise<void> {
-  if (req.params['userId']) {
-    try {
-      const posts = await Post.find({ userId: req.params["userId"] });
-      res.send({ posts });
-    } catch (err) {
-        next(err);
-    }
-  } else {
-    res.sendStatus(400);
+async function getUser(req: Request, res: Response, next: NextFunction) {
+  if (!ObjectId.isValid(req.params['userId'])) { return res.sendStatus(400); } // invalid BSON string
+  try {
+    const user = await User.findById(req.params['userId']);
+    if (!user) return res.sendStatus(404);
+    res.send({ user });
+  } catch (err) {
+    next(err);
   }
 }
 
@@ -63,8 +48,11 @@ async function createUser(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-async function updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+async function updateUser(req: Request, res: Response, next: NextFunction) {
   const { userId } = req.params;
+  if (!ObjectId.isValid(userId)) { return res.sendStatus(400); }
+  const userExists = !! await User.findById(userId);
+  if (!userExists) { return res.sendStatus(404); }
   const { firstName, lastName, username, password, isAuthor } = req.body;
   try {
     const salt = await bcrypt.genSalt(10);
@@ -97,7 +85,6 @@ async function deleteUser(req: Request, res: Response, next: NextFunction): Prom
 const userController = {
   getUsers,
   getUser,
-  getUserPosts,
   createUser,
   updateUser,
   deleteUser,

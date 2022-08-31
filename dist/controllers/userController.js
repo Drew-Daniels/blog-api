@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userModel_1 = require("../models/userModel");
-const postModel_1 = require("../models/postModel");
+const mongodb_1 = require("mongodb");
 function getUsers(_req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -28,33 +28,17 @@ function getUsers(_req, res, next) {
 }
 function getUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (req.params["userId"]) {
-            try {
-                const user = yield userModel_1.User.findById(req.params["userId"]);
-                res.send({ user });
-            }
-            catch (err) {
-                next(err);
-            }
+        if (!mongodb_1.ObjectId.isValid(req.params['userId'])) {
+            return res.sendStatus(400);
+        } // invalid BSON string
+        try {
+            const user = yield userModel_1.User.findById(req.params['userId']);
+            if (!user)
+                return res.sendStatus(404);
+            res.send({ user });
         }
-        else {
-            res.sendStatus(400);
-        }
-    });
-}
-function getUserPosts(req, res, next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (req.params['userId']) {
-            try {
-                const posts = yield postModel_1.Post.find({ userId: req.params["userId"] });
-                res.send({ posts });
-            }
-            catch (err) {
-                next(err);
-            }
-        }
-        else {
-            res.sendStatus(400);
+        catch (err) {
+            next(err);
         }
     });
 }
@@ -89,6 +73,13 @@ function createUser(req, res, next) {
 function updateUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { userId } = req.params;
+        if (!mongodb_1.ObjectId.isValid(userId)) {
+            return res.sendStatus(400);
+        }
+        const userExists = !!(yield userModel_1.User.findById(userId));
+        if (!userExists) {
+            return res.sendStatus(404);
+        }
         const { firstName, lastName, username, password, isAuthor } = req.body;
         try {
             const salt = yield bcryptjs_1.default.genSalt(10);
@@ -124,7 +115,6 @@ function deleteUser(req, res, next) {
 const userController = {
     getUsers,
     getUser,
-    getUserPosts,
     createUser,
     updateUser,
     deleteUser,

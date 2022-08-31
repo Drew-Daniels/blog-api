@@ -41,7 +41,7 @@ async function getPost(req: Request, res: Response, next: NextFunction): Promise
 async function getUserPosts(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { userId } = req.params;
   try {
-    const posts = await Post.find({ author: userId })
+    const posts = await Post.find({ author: userId });
     res.send({ posts });
   } catch (err) {
     next(err);

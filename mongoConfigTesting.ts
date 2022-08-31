@@ -23,11 +23,6 @@ async function startupMongoServer() {
     }
     console.log(e);
   });
-
-  // mongoose.connection.once('open', () => {
-  //   console.log(`MongoDB successfully connected to ${mongoUri}`);
-  // });
-  // TODO: move this into a separate function
   const { firstName, lastName, username, password } = SEED_USER_INFO;
   try {
     const salt = await bcrypt.genSalt(10);
@@ -39,7 +34,7 @@ async function startupMongoServer() {
       hash,
     });
     await user.save();
-    console.log('Test user created: ', user);
+    return user.id;
   } catch (err) {
     console.log(err);
   }
