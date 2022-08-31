@@ -196,10 +196,30 @@ describe('PUT /api/users/:userId', () => {
 });
 describe('DELETE /api/users/:userId', () => {
   describe('returns an error response when: ', () => {
-    test.todo('returns an error response when userId is not a valid ObjectId');
-    test.todo('returns an error response when ')
+    test('request is not authenticated', done => {
+      request(app)
+        .delete('/users/' + userId)
+        .expect(401, done);
+    });
+    test('request is authenticated, but userId is not a valid ObjectId', done => {
+      request(app)
+        .delete('/users/' + '630eaf711a7937a1a037d1cg')
+        .auth(token, { type: 'bearer' })
+        .expect(400, done);
+    });
+    test('request is authenticated, and userId is valid ObjectId, but does not match document in db', done => {
+      request(app)
+        .delete('/users/' + '630eaf711a7937a1a037d1cd')
+        .auth(token, { type: 'bearer' })
+        .expect(404, done);
+    });
   });
-  test.todo('deletes a user with an id matching userId when userId is a valid ObjectId and matches a document in db')
+  test('deletes a user with an id matching userId when userId is a valid ObjectId and matches a document in db', done => {
+    request(app)
+      .delete('/users/' + userId)
+      .auth(token, { type: 'bearer' })
+      .expect(200, done);
+  });
 });
 describe('GET /api/users/:userId/posts', () => {
   describe('returns an error response when: ', () => {
