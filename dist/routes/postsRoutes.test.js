@@ -320,25 +320,86 @@ describe('PUT "api/posts/:postId/comments/:commentId"', () => {
             });
         });
         describe('request is authenticated, but commentId: ', () => {
-            test.todo('is not a valid ObjectId');
-            test.todo('does not belong to a comment in the db');
+            test('is not a valid ObjectId', done => {
+                (0, supertest_1.default)(app)
+                    .put('/posts/' + postId + '/comments/' + '6310b243edf88b4a676ac54g')
+                    .auth(token, { type: 'bearer' })
+                    .send(constants_1.UPDATED_COMMENT_INFO)
+                    .expect(400, done);
+            });
+            test('does not belong to a comment in the db', done => {
+                (0, supertest_1.default)(app)
+                    .put('/posts/' + postId + '/comments/' + '6310b243edf88b4a676ac549')
+                    .auth(token, { type: 'bearer' })
+                    .send(constants_1.UPDATED_COMMENT_INFO)
+                    .expect(404, done);
+            });
         });
         describe('body is: ', () => {
-            test.todo('undefined');
-            test.todo('a blank string');
-            test.todo('greater than 300 characters');
+            test('a blank string', done => {
+                (0, supertest_1.default)(app)
+                    .put('/posts/' + postId + '/comments/' + commentId)
+                    .auth(token, { type: 'bearer' })
+                    .send(Object.assign(Object.assign({}, constants_1.UPDATED_COMMENT_INFO), { body: '' }))
+                    .expect(400, done);
+            });
+            test('greater than 300 characters', done => {
+                (0, supertest_1.default)(app)
+                    .put('/posts/' + postId + '/comments/' + commentId)
+                    .auth(token, { type: 'bearer' })
+                    .send(Object.assign(Object.assign({}, constants_1.UPDATED_COMMENT_INFO), { body: 'ty9SFTcbYGAH9TurIuER5AQ0LUh9u3Mk56A76SpQ5pJWop6MqjkE9nCsokgJIfqsvPB1CmQV5v4X7o6xyEaUwqCDGl6W44looYlt2Iqop4RpEWRow63H8ozzbtaRcNGUaRiUVB7pgCADzqOpn1ENKoM8UVr4aZjjONPW1Tn6HTA2SrgghXR8XQQ9YztDARGuJ5rXZaJ5byFvlnI830l360kegGboHtZPQZaTUfyiiw9oLFwEHhxicNb7KzCebdB5j7QT6BETgmAve8LdfT8Wr0C6R7Bw07byDM6aQWNYwezGj' }))
+                    .expect(400, done);
+            });
         });
     });
     describe('returns an updated comment when: ', () => {
-        test.todo('request is authenticated and body meets criteria');
+        test('request is authenticated and body meets criteria', done => {
+            (0, supertest_1.default)(app)
+                .put('/posts/' + postId + '/comments/' + commentId)
+                .auth(token, { type: 'bearer' })
+                .send(constants_1.UPDATED_COMMENT_INFO)
+                .expect(200, done);
+        });
     });
 });
 describe('DELETE "api/posts/:postId/comments/:commentId"', () => {
     describe('returns an error response when: ', () => {
-        test.todo('request is unauthenticated');
-        test.todo('request is authenticated, but the commentId does not belong to a comment in the db');
+        test('request is unauthenticated', done => {
+            (0, supertest_1.default)(app)
+                .delete('/posts/' + postId + '/comments/' + commentId)
+                .expect(401, done);
+        });
+        test('request is authenticated, but the postId is not a valid ObjectId', done => {
+            (0, supertest_1.default)(app)
+                .delete('/posts/' + '6310b243edf88b4a676ac54g' + '/comments/' + commentId)
+                .auth(token, { type: 'bearer' })
+                .expect(400, done);
+        });
+        test('request is authenticated, but the postId does not belong to a post in the db', done => {
+            (0, supertest_1.default)(app)
+                .delete('/posts/' + '6310b243edf88b4a676ac549' + '/comments/' + commentId)
+                .auth(token, { type: 'bearer' })
+                .expect(404, done);
+        });
+        test('request is authenticated, but the commentId is not a valid ObjectId', done => {
+            (0, supertest_1.default)(app)
+                .delete('/posts/' + postId + '/comments/' + '6310b243edf88b4a676ac54g')
+                .auth(token, { type: 'bearer' })
+                .expect(400, done);
+        });
+        test('request is authenticated, but the commentId does not belong to a comment in the db', done => {
+            (0, supertest_1.default)(app)
+                .delete('/posts/' + postId + '/comments/' + '6310b243edf88b4a676ac549')
+                .auth(token, { type: 'bearer' })
+                .expect(404, done);
+        });
     });
     describe('deletes a comment when: ', () => {
-        test.todo('request is authenticated and commentId belongs to a comment in the db');
+        test('request is authenticated and commentId belongs to a comment in the db', done => {
+            (0, supertest_1.default)(app)
+                .delete('/posts/' + postId + '/comments/' + commentId)
+                .auth(token, { type: 'bearer' })
+                .expect(200, done);
+        });
     });
 });

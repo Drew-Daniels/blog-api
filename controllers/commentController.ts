@@ -49,8 +49,12 @@ async function updateComment(req: Request, res: Response, next: NextFunction) {
 }
 
 async function deleteComment(req: Request, res: Response, next: NextFunction) {
-  const { commentId } = req.params;
+  const { postId, commentId } = req.params;
+  if (!ObjectId.isValid(postId) || !ObjectId.isValid(commentId)) return res.sendStatus(400);
   try {
+    const postExists = !! await Post.findById(postId);
+    const commentExists = !! await Comment.findById(commentId);
+    if (!postExists || !commentExists) return res.sendStatus(404);
     await Comment.findByIdAndDelete(commentId);
     console.log(`Comment ${commentId} deleted`);
     res.sendStatus(200);
