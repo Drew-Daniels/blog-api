@@ -49,9 +49,15 @@ function createComment(req, res, next) {
 }
 function updateComment(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { commentId } = req.params;
+        const { postId, commentId } = req.params;
+        if (!mongodb_1.ObjectId.isValid(postId) || !mongodb_1.ObjectId.isValid(commentId))
+            return res.sendStatus(400);
         const { body } = req.body;
         try {
+            const postExists = !!(yield postModel_1.Post.findById(postId));
+            const commentExists = !!(yield commentModel_1.Comment.findById(commentId));
+            if (!postExists || !commentExists)
+                return res.sendStatus(404);
             const comment = yield commentModel_1.Comment.findByIdAndUpdate(commentId, { body }, { returnDocument: 'after' });
             console.log(`Comment ${commentId} has been updated: ${comment}`);
             res.send({ comment });

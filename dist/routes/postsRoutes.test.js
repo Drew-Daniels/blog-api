@@ -296,9 +296,31 @@ describe('POST "api/posts/:postId/comments"', () => {
 describe('PUT "api/posts/:postId/comments/:commentId"', () => {
     describe('returns an error response when: ', () => {
         describe('request is: ', () => {
-            test.todo('unauthenticated');
+            test('unauthenticated', done => {
+                (0, supertest_1.default)(app)
+                    .put('/posts/' + postId + '/comments/' + commentId)
+                    .send(constants_1.UPDATED_COMMENT_INFO)
+                    .expect(401, done);
+            });
         });
-        describe('commentId: ', () => {
+        describe('request is authenticated, but postId: ', () => {
+            test('is not a valid ObjectId', done => {
+                (0, supertest_1.default)(app)
+                    .put('/posts/' + '6310b243edf88b4a676ac54g' + '/comments/' + commentId)
+                    .auth(token, { type: 'bearer' })
+                    .send(constants_1.UPDATED_COMMENT_INFO)
+                    .expect(400, done);
+            });
+            test('does not belong to a post in db', done => {
+                (0, supertest_1.default)(app)
+                    .put('/posts/' + '6310b243edf88b4a676ac549' + '/comments/' + commentId)
+                    .auth(token, { type: 'bearer' })
+                    .send(constants_1.UPDATED_COMMENT_INFO)
+                    .expect(404, done);
+            });
+        });
+        describe('request is authenticated, but commentId: ', () => {
+            test.todo('is not a valid ObjectId');
             test.todo('does not belong to a comment in the db');
         });
         describe('body is: ', () => {

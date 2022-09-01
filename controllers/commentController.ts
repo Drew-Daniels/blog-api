@@ -33,9 +33,13 @@ async function createComment(req: Request, res: Response, next: NextFunction) {
 }
 
 async function updateComment(req: Request, res: Response, next: NextFunction) {
-  const { commentId } = req.params;
+  const { postId, commentId } = req.params;
+  if (!ObjectId.isValid(postId) || !ObjectId.isValid(commentId)) return res.sendStatus(400);
   const { body } = req.body;
   try {
+    const postExists = !! await Post.findById(postId);
+    const commentExists = !! await Comment.findById(commentId);
+    if (!postExists || !commentExists) return res.sendStatus(404);
     const comment = await Comment.findByIdAndUpdate(commentId, { body }, { returnDocument: 'after' })
     console.log(`Comment ${commentId} has been updated: ${comment}`);
     res.send({ comment });

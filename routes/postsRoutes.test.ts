@@ -13,7 +13,14 @@ import { startupMongoServer, shutdownMongoServer } from "../mongoConfigTesting";
 import passport from "../passportConfig";
 import authRouter from "./authRoutes";
 import postsRouter from "./postsRoutes";
-import {SEED_USER_INFO, NEW_POST_INFO, UPDATED_POST_INFO, UPDATED_USER_INFO, NEW_COMMENT_INFO} from "../constants";
+import {
+  SEED_USER_INFO,
+  NEW_POST_INFO,
+  UPDATED_POST_INFO,
+  UPDATED_USER_INFO,
+  NEW_COMMENT_INFO,
+  UPDATED_COMMENT_INFO
+} from "../constants";
 
 const creds = { username: SEED_USER_INFO.username, password: SEED_USER_INFO.password };
 
@@ -294,9 +301,31 @@ describe('POST "api/posts/:postId/comments"', () => {
 describe('PUT "api/posts/:postId/comments/:commentId"', () => {
   describe('returns an error response when: ', () => {
     describe('request is: ', () => {
-      test.todo('unauthenticated');
+      test('unauthenticated', done => {
+        request(app)
+          .put('/posts/' + postId + '/comments/' + commentId)
+          .send(UPDATED_COMMENT_INFO)
+          .expect(401, done);
+      });
     });
-    describe('commentId: ', () => {
+    describe('request is authenticated, but postId: ', () => {
+      test('is not a valid ObjectId', done => {
+        request(app)
+          .put('/posts/' + '6310b243edf88b4a676ac54g' + '/comments/' + commentId)
+          .auth(token, { type: 'bearer' })
+          .send(UPDATED_COMMENT_INFO)
+          .expect(400, done);
+      });
+      test('does not belong to a post in db', done => {
+        request(app)
+          .put('/posts/' + '6310b243edf88b4a676ac549' + '/comments/' + commentId)
+          .auth(token, { type: 'bearer' })
+          .send(UPDATED_COMMENT_INFO)
+          .expect(404, done);
+      });
+    })
+    describe('request is authenticated, but commentId: ', () => {
+      test.todo('is not a valid ObjectId')
       test.todo('does not belong to a comment in the db');
     });
     describe('body is: ', () => {
