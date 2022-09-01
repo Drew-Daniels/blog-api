@@ -27,17 +27,16 @@ async function getPosts(_req: Request, res: Response, next: NextFunction): Promi
   }
 }
 
-async function getPost(req: Request, res: Response, next: NextFunction): Promise<void> {
-  if (req.params['postId']) {
-    try {
-      const post = await Post.findById(req.params['postId']);
-      // TODO: hydrate w/ comments
-      res.status(200).json({ post });
-    } catch (err) {
-        next(err);
-    }
+async function getPost(req: Request, res: Response, next: NextFunction) {
+  if (!ObjectId.isValid(req.params['postId'])) return res.sendStatus(400);
+  try {
+    const post = await Post.findById(req.params['postId']);
+    if (!post) return res.sendStatus(404);
+    // TODO: hydrate w/ comments
+    return res.status(200).json({ post });
+  } catch (err) {
+      next(err);
   }
-  res.status(400).end();
 }
 
 async function getUserPosts(req: Request, res: Response, next: NextFunction) {
@@ -54,7 +53,6 @@ async function getUserPosts(req: Request, res: Response, next: NextFunction) {
 }
 
 async function createPost(req: Request, res: Response, next: NextFunction): Promise<void> {
-  console.log('req.body: ', req.body);
   const { title, body } = req.body;
   try {
     const post = await Post.create({
@@ -84,12 +82,15 @@ async function updatePost(req: Request, res: Response, next: NextFunction): Prom
   }
 }
 
-async function deletePost(req: Request, res: Response, next: NextFunction): Promise<void> {
+async function deletePost(req: Request, res: Response, next: NextFunction) {
   const { postId } = req.params;
+  if (!ObjectId.isValid(postId)) return res.sendStatus(400);
   try {
+    const postExists = !! await Post.findById(postId);
+    if (!postExists) return res.sendStatus(404);
     await Post.findByIdAndDelete(postId);
     console.log(`Post ${postId} has been deleted`);
-    res.sendStatus(200);
+    return res.sendStatus(200);
   } catch (err) {
     next(err);
   }

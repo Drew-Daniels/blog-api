@@ -72,13 +72,6 @@ describe('POST "api/posts"', () => {
                 .expect(401, done);
         });
         describe('request is authenticated, but title is: ', () => {
-            test('undefined', done => {
-                (0, supertest_1.default)(app)
-                    .post('/posts')
-                    .auth(token, { type: 'bearer' })
-                    .send(Object.assign(Object.assign({}, constants_1.NEW_POST_INFO), { title: undefined }))
-                    .expect(400, done);
-            });
             test('a blank string', done => {
                 (0, supertest_1.default)(app)
                     .post('/posts')
@@ -95,13 +88,6 @@ describe('POST "api/posts"', () => {
             });
         });
         describe('request is authenticated, but body is: ', () => {
-            test('undefined', done => {
-                (0, supertest_1.default)(app)
-                    .post('/posts')
-                    .auth(token, { type: 'bearer' })
-                    .send(Object.assign(Object.assign({}, constants_1.NEW_POST_INFO), { body: undefined }))
-                    .expect(400, done);
-            });
             test('a blank string', done => {
                 (0, supertest_1.default)(app)
                     .post('/posts')
@@ -135,35 +121,109 @@ describe('GET "api/posts/:postId"', () => {
                 .get('/posts/' + postId)
                 .expect(401, done);
         });
-        test.todo('request is authenticated but postId does not belong to a post in the db');
+        test('request is authenticated but postId is not a valid ObjectId', done => {
+            (0, supertest_1.default)(app)
+                .get('/posts/' + '6310aede9f3ebc201714e0eg')
+                .auth(token, { type: 'bearer' })
+                .expect(400, done);
+        });
+        test('request is authenticated but postId does not belong to a post in the db', done => {
+            (0, supertest_1.default)(app)
+                .get('/posts/' + '6310aede9f3ebc201714e0e9')
+                .auth(token, { type: 'bearer' })
+                .expect(404, done);
+        });
     });
     describe('returns a post when: ', () => {
-        test.todo('request is authenticated and postId belongs to a post in the db');
+        test('request is authenticated and postId belongs to a post in the db', done => {
+            (0, supertest_1.default)(app)
+                .get('/posts/' + postId)
+                .auth(token, { type: 'bearer' })
+                .expect(200, done);
+        });
     });
 });
 describe('PUT "api/posts/:postId"', () => {
     describe('returns an error response when: ', () => {
         describe('request is: ', () => {
-            test.todo('unauthenticated');
+            test('unauthenticated', done => {
+                (0, supertest_1.default)(app)
+                    .put('/posts/' + postId)
+                    .send(constants_1.UPDATED_POST_INFO)
+                    .expect(401, done);
+            });
         });
         describe('title is: ', () => {
-            test.todo('undefined');
-            test.todo('a blank string');
-            test.todo('greater than 100 characters');
+            test('a blank string', done => {
+                (0, supertest_1.default)(app)
+                    .put('/posts/' + postId)
+                    .auth(token, { type: 'bearer' })
+                    .send(Object.assign(Object.assign({}, constants_1.UPDATED_POST_INFO), { title: '' }))
+                    .expect(400, done);
+            });
+            test('greater than 100 characters', done => {
+                (0, supertest_1.default)(app)
+                    .put('/posts/' + postId)
+                    .auth(token, { type: 'bearer' })
+                    .send(Object.assign(Object.assign({}, constants_1.UPDATED_POST_INFO), { title: 'y08vKU0RkDQSuOxE1UIeViK695gdpptYadXOTP1zHR65kvMreADA8Kv00F7Axrs80t7Pvajhrtauq5e26c6aYmy6WqMgkHc5Za01j' }))
+                    .expect(400, done);
+            });
         });
         describe('body is: ', () => {
-            test.todo('undefined');
-            test.todo('a blank string');
-            test.todo('greater than 300 characters');
+            test('a blank string', done => {
+                (0, supertest_1.default)(app)
+                    .put('/posts/' + postId)
+                    .auth(token, { type: 'bearer' })
+                    .send(Object.assign(Object.assign({}, constants_1.UPDATED_POST_INFO), { body: '' }))
+                    .expect(400, done);
+            });
+            test('greater than 300 characters', done => {
+                (0, supertest_1.default)(app)
+                    .put('/posts/' + postId)
+                    .auth(token, { type: 'bearer' })
+                    .send(Object.assign(Object.assign({}, constants_1.UPDATED_POST_INFO), { body: 'ty9SFTcbYGAH9TurIuER5AQ0LUh9u3Mk56A76SpQ5pJWop6MqjkE9nCsokgJIfqsvPB1CmQV5v4X7o6xyEaUwqCDGl6W44looYlt2Iqop4RpEWRow63H8ozzbtaRcNGUaRiUVB7pgCADzqOpn1ENKoM8UVr4aZjjONPW1Tn6HTA2SrgghXR8XQQ9YztDARGuJ5rXZaJ5byFvlnI830l360kegGboHtZPQZaTUfyiiw9oLFwEHhxicNb7KzCebdB5j7QT6BETgmAve8LdfT8Wr0C6R7Bw07byDM6aQWNYwezGj' }))
+                    .expect(400, done);
+            });
         });
     });
     describe('returns an updated post when: ', () => {
-        test.todo('request is authenticated, and title and body meet requirements');
+        test('request is authenticated, and title and body meet requirements', done => {
+            (0, supertest_1.default)(app)
+                .put('/posts/' + postId)
+                .auth(token, { type: 'bearer' })
+                .send(constants_1.UPDATED_POST_INFO)
+                .expect(200, done);
+        });
     });
 });
 describe('DELETE "api/posts/:postId"', () => {
-    test.todo('returns an error response when  request is unauthenticated');
-    test.todo('returns a success response when request is authenticated');
+    describe('returns an error response when:', () => {
+        test('request is unauthenticated', done => {
+            (0, supertest_1.default)(app)
+                .delete('/posts/' + postId)
+                .expect(401, done);
+        });
+        test('request is authenticated, but postId is invalid ObjectId', done => {
+            (0, supertest_1.default)(app)
+                .delete('/posts/' + '6310b243edf88b4a676ac54g')
+                .auth(token, { type: 'bearer' })
+                .expect(400, done);
+        });
+        test('request is authenticated, but postId does not belong to a post in db', done => {
+            (0, supertest_1.default)(app)
+                .delete('/posts/' + '6310b243edf88b4a676ac549')
+                .auth(token, { type: 'bearer' })
+                .expect(404, done);
+        });
+    });
+    describe('deletes a post and returns a success response when: ', () => {
+        test('request is authenticated, and postId matches a post in db', done => {
+            (0, supertest_1.default)(app)
+                .delete('/posts/' + postId)
+                .auth(token, { type: 'bearer' })
+                .expect(200, done);
+        });
+    });
 });
 describe('GET "api/posts/:postId/comments"', () => {
     describe('returns an error response when: ', () => {

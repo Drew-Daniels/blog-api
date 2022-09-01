@@ -33,17 +33,18 @@ function getPosts(_req, res, next) {
 }
 function getPost(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (req.params['postId']) {
-            try {
-                const post = yield postModel_1.Post.findById(req.params['postId']);
-                // TODO: hydrate w/ comments
-                res.status(200).json({ post });
-            }
-            catch (err) {
-                next(err);
-            }
+        if (!mongodb_1.ObjectId.isValid(req.params['postId']))
+            return res.sendStatus(400);
+        try {
+            const post = yield postModel_1.Post.findById(req.params['postId']);
+            if (!post)
+                return res.sendStatus(404);
+            // TODO: hydrate w/ comments
+            return res.status(200).json({ post });
         }
-        res.status(400).end();
+        catch (err) {
+            next(err);
+        }
     });
 }
 function getUserPosts(req, res, next) {
@@ -65,7 +66,6 @@ function getUserPosts(req, res, next) {
 }
 function createPost(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('req.body: ', req.body);
         const { title, body } = req.body;
         try {
             const post = yield postModel_1.Post.create({
@@ -103,10 +103,15 @@ function updatePost(req, res, next) {
 function deletePost(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { postId } = req.params;
+        if (!mongodb_1.ObjectId.isValid(postId))
+            return res.sendStatus(400);
         try {
+            const postExists = !!(yield postModel_1.Post.findById(postId));
+            if (!postExists)
+                return res.sendStatus(404);
             yield postModel_1.Post.findByIdAndDelete(postId);
             console.log(`Post ${postId} has been deleted`);
-            res.sendStatus(200);
+            return res.sendStatus(200);
         }
         catch (err) {
             next(err);
