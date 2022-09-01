@@ -37,10 +37,12 @@ const server = app.listen(() => {
 var token;
 var userId;
 var postId;
+var commentId;
 beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
     const seedInfo = yield (0, mongoConfigTesting_1.startupMongoServer)();
     userId = seedInfo.seedUserId;
     postId = seedInfo.seedPostId;
+    commentId = seedInfo.seedCommentId;
     const response = yield (0, supertest_1.default)(app)
         .post('/auth')
         .send(creds);
@@ -227,24 +229,68 @@ describe('DELETE "api/posts/:postId"', () => {
 });
 describe('GET "api/posts/:postId/comments"', () => {
     describe('returns an error response when: ', () => {
-        test.todo('request is unauthenticated');
-        test.todo('request is authenticated, but postId does not belong to a post in the db');
+        test('request is unauthenticated', done => {
+            (0, supertest_1.default)(app)
+                .get('/posts/' + postId + '/comments')
+                .expect(401, done);
+        });
+        test('request is authenticated, but postId is not a valid ObjectId', done => {
+            (0, supertest_1.default)(app)
+                .get('/posts/' + '6310b243edf88b4a676ac54g' + '/comments')
+                .auth(token, { type: 'bearer' })
+                .expect(400, done);
+        });
+        test('request is authenticated, but postId does not belong to a post in the db', done => {
+            (0, supertest_1.default)(app)
+                .get('/posts/' + '6310b243edf88b4a676ac549' + '/comments')
+                .auth(token, { type: 'bearer' })
+                .expect(404, done);
+        });
     });
     describe('returns a specific post\'s comments when: ', () => {
-        test.todo('request is authenticated and postId belongs to a post in the db');
+        test('request is authenticated and postId belongs to a post in the db', done => {
+            (0, supertest_1.default)(app)
+                .get('/posts/' + postId + '/comments')
+                .auth(token, { type: 'bearer' })
+                .expect(200, done);
+        });
     });
 });
 describe('POST "api/posts/:postId/comments"', () => {
     describe('returns an error response when: ', () => {
-        test.todo('unauthenticated');
+        describe('request is: ', () => {
+            test('unauthenticated', done => {
+                (0, supertest_1.default)(app)
+                    .post('/posts/' + postId + '/comments')
+                    .send(constants_1.NEW_COMMENT_INFO)
+                    .expect(401, done);
+            });
+        });
         describe('body is: ', () => {
-            test.todo('undefined');
-            test.todo('a blank string');
-            test.todo('greater than 300 characters');
+            test('a blank string', done => {
+                (0, supertest_1.default)(app)
+                    .post('/posts/' + postId + '/comments')
+                    .auth(token, { type: 'bearer' })
+                    .send(Object.assign(Object.assign({}, constants_1.NEW_COMMENT_INFO), { body: '' }))
+                    .expect(400, done);
+            });
+            test('greater than 300 characters', done => {
+                (0, supertest_1.default)(app)
+                    .post('/posts/' + postId + '/comments')
+                    .auth(token, { type: 'bearer' })
+                    .send(Object.assign(Object.assign({}, constants_1.NEW_COMMENT_INFO), { body: 'ty9SFTcbYGAH9TurIuER5AQ0LUh9u3Mk56A76SpQ5pJWop6MqjkE9nCsokgJIfqsvPB1CmQV5v4X7o6xyEaUwqCDGl6W44looYlt2Iqop4RpEWRow63H8ozzbtaRcNGUaRiUVB7pgCADzqOpn1ENKoM8UVr4aZjjONPW1Tn6HTA2SrgghXR8XQQ9YztDARGuJ5rXZaJ5byFvlnI830l360kegGboHtZPQZaTUfyiiw9oLFwEHhxicNb7KzCebdB5j7QT6BETgmAve8LdfT8Wr0C6R7Bw07byDM6aQWNYwezGj' }))
+                    .expect(400, done);
+            });
         });
     });
     describe('creates and returns a new post comment when: ', () => {
-        test.todo('request is authenticated and body meets criteria');
+        test('request is authenticated and body meets criteria', done => {
+            (0, supertest_1.default)(app)
+                .post('/posts/' + postId + '/comments')
+                .auth(token, { type: 'bearer' })
+                .send(constants_1.NEW_COMMENT_INFO)
+                .expect(200, done);
+        });
     });
 });
 describe('PUT "api/posts/:postId/comments/:commentId"', () => {

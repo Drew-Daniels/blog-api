@@ -18,6 +18,7 @@ const mongodb_memory_server_1 = require("mongodb-memory-server");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userModel_1 = require("./models/userModel");
 const postModel_1 = require("./models/postModel");
+const commentModel_1 = require("./models/commentModel");
 const constants_1 = require("./constants");
 var mongoServer;
 function startupMongoServer() {
@@ -54,7 +55,14 @@ function startupMongoServer() {
                 body: 'First post body!',
             });
             yield post.save();
-            return { seedUserId: user.id, seedPostId: post.id };
+            // seed one comment by seeded user
+            const comment = new commentModel_1.Comment({
+                author: user,
+                post: post,
+                body: 'First comment body!'
+            });
+            yield comment.save();
+            return { seedUserId: user.id, seedPostId: post.id, seedCommentId: comment.id };
         }
         catch (err) {
             console.log(err);

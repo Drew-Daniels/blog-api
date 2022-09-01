@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 import { IPost, Post } from '../models/postModel';
 import { IComment, Comment } from '../models/commentModel';
 import {ObjectId} from "mongodb";
-import {User} from "../models/userModel";
+import { User } from "../models/userModel";
 
 interface ILeanPost extends IPost {
   _id: Types.ObjectId;

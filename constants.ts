@@ -22,11 +22,6 @@ const NEW_USER_INFO = {
   passwordConfirm: 'X%!B4ZV8zKTE*Y!d',
 }
 
-const SEED_POST_INFO = {
-  title: 'First post title!',
-  body: 'First post body!',
-};
-
 const UPDATED_POST_INFO = {
   title: 'Updated post title!',
   body: 'Updated post body!',
@@ -37,11 +32,20 @@ const NEW_POST_INFO = {
   body: 'New post body!',
 }
 
+const UPDATED_COMMENT_INFO = {
+  body: 'Updated comment body!'
+}
+
+const NEW_COMMENT_INFO = {
+ body: 'New comment body!'
+}
+
 export {
   SEED_USER_INFO,
   UPDATED_USER_INFO,
   NEW_USER_INFO,
-  SEED_POST_INFO,
   UPDATED_POST_INFO,
   NEW_POST_INFO,
+  UPDATED_COMMENT_INFO,
+  NEW_COMMENT_INFO,
 }

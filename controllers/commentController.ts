@@ -1,9 +1,14 @@
 import { Request, Response, NextFunction } from "express";
+import { Post } from "../models/postModel";
 import { Comment } from "../models/commentModel";
+import { ObjectId } from "mongodb";
 
-async function getComments(req: Request, res: Response, next: NextFunction): Promise<void> {
+async function getComments(req: Request, res: Response, next: NextFunction) {
   const { postId } = req.params;
+  if (!ObjectId.isValid(postId)) return res.sendStatus(400);
   try {
+    const postExists = !! await Post.findById(postId);
+    if (!postExists) return res.sendStatus(404);
     const comments = await Comment.find({ postId }).lean();
     res.send({ comments });
   } catch (err) {

@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 
 import { User } from "./models/userModel";
 import { Post } from "./models/postModel";
+import { Comment } from "./models/commentModel";
 import { SEED_USER_INFO } from './constants';
 
 var mongoServer: MongoMemoryServer;
@@ -43,7 +44,14 @@ async function startupMongoServer() {
       body: 'First post body!',
     });
     await post.save();
-    return { seedUserId:  user.id, seedPostId: post.id };
+    // seed one comment by seeded user
+    const comment = new Comment({
+      author: user,
+      post: post,
+      body: 'First comment body!'
+    });
+    await comment.save();
+    return { seedUserId:  user.id, seedPostId: post.id, seedCommentId: comment.id };
   } catch (err) {
     console.log(err);
   }

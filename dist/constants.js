@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NEW_POST_INFO = exports.UPDATED_POST_INFO = exports.SEED_POST_INFO = exports.NEW_USER_INFO = exports.UPDATED_USER_INFO = exports.SEED_USER_INFO = void 0;
+exports.NEW_COMMENT_INFO = exports.UPDATED_COMMENT_INFO = exports.NEW_POST_INFO = exports.UPDATED_POST_INFO = exports.NEW_USER_INFO = exports.UPDATED_USER_INFO = exports.SEED_USER_INFO = void 0;
 const SEED_USER_INFO = {
     firstName: 'Drew',
     lastName: 'Daniels',
@@ -25,11 +25,6 @@ const NEW_USER_INFO = {
     passwordConfirm: 'X%!B4ZV8zKTE*Y!d',
 };
 exports.NEW_USER_INFO = NEW_USER_INFO;
-const SEED_POST_INFO = {
-    title: 'First post title!',
-    body: 'First post body!',
-};
-exports.SEED_POST_INFO = SEED_POST_INFO;
 const UPDATED_POST_INFO = {
     title: 'Updated post title!',
     body: 'Updated post body!',
@@ -40,3 +35,11 @@ const NEW_POST_INFO = {
     body: 'New post body!',
 };
 exports.NEW_POST_INFO = NEW_POST_INFO;
+const UPDATED_COMMENT_INFO = {
+    body: 'Updated comment body!'
+};
+exports.UPDATED_COMMENT_INFO = UPDATED_COMMENT_INFO;
+const NEW_COMMENT_INFO = {
+    body: 'New comment body!'
+};
+exports.NEW_COMMENT_INFO = NEW_COMMENT_INFO;
