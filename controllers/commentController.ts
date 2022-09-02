@@ -1,9 +1,14 @@
 import { Request, Response, NextFunction } from "express";
+import { Post } from "../models/postModel";
 import { Comment } from "../models/commentModel";
+import { ObjectId } from "mongodb";
 
-async function getComments(req: Request, res: Response, next: NextFunction): Promise<void> {
+async function getComments(req: Request, res: Response, next: NextFunction) {
   const { postId } = req.params;
+  if (!ObjectId.isValid(postId)) return res.sendStatus(400);
   try {
+    const postExists = !! await Post.findById(postId);
+    if (!postExists) return res.sendStatus(404);
     const comments = await Comment.find({ postId }).lean();
     res.send({ comments });
   } catch (err) {
@@ -28,9 +33,13 @@ async function createComment(req: Request, res: Response, next: NextFunction) {
 }
 
 async function updateComment(req: Request, res: Response, next: NextFunction) {
-  const { commentId } = req.params;
+  const { postId, commentId } = req.params;
+  if (!ObjectId.isValid(postId) || !ObjectId.isValid(commentId)) return res.sendStatus(400);
   const { body } = req.body;
   try {
+    const postExists = !! await Post.findById(postId);
+    const commentExists = !! await Comment.findById(commentId);
+    if (!postExists || !commentExists) return res.sendStatus(404);
     const comment = await Comment.findByIdAndUpdate(commentId, { body }, { returnDocument: 'after' })
     console.log(`Comment ${commentId} has been updated: ${comment}`);
     res.send({ comment });
@@ -40,8 +49,12 @@ async function updateComment(req: Request, res: Response, next: NextFunction) {
 }
 
 async function deleteComment(req: Request, res: Response, next: NextFunction) {
-  const { commentId } = req.params;
+  const { postId, commentId } = req.params;
+  if (!ObjectId.isValid(postId) || !ObjectId.isValid(commentId)) return res.sendStatus(400);
   try {
+    const postExists = !! await Post.findById(postId);
+    const commentExists = !! await Comment.findById(commentId);
+    if (!postExists || !commentExists) return res.sendStatus(404);
     await Comment.findByIdAndDelete(commentId);
     console.log(`Comment ${commentId} deleted`);
     res.sendStatus(200);

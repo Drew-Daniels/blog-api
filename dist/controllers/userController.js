@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userModel_1 = require("../models/userModel");
-const postModel_1 = require("../models/postModel");
+const mongodb_1 = require("mongodb");
 function getUsers(_req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -28,33 +28,17 @@ function getUsers(_req, res, next) {
 }
 function getUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (req.params["userId"]) {
-            try {
-                const user = yield userModel_1.User.findById(req.params["userId"]);
-                res.send({ user });
-            }
-            catch (err) {
-                next(err);
-            }
+        if (!mongodb_1.ObjectId.isValid(req.params['userId'])) {
+            return res.sendStatus(400);
+        } // invalid BSON string
+        try {
+            const user = yield userModel_1.User.findById(req.params['userId']);
+            if (!user)
+                return res.sendStatus(404);
+            res.send({ user });
         }
-        else {
-            res.sendStatus(400);
-        }
-    });
-}
-function getUserPosts(req, res, next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (req.params['userId']) {
-            try {
-                const posts = yield postModel_1.Post.find({ userId: req.params["userId"] });
-                res.send({ posts });
-            }
-            catch (err) {
-                next(err);
-            }
-        }
-        else {
-            res.sendStatus(400);
+        catch (err) {
+            next(err);
         }
     });
 }
@@ -63,70 +47,68 @@ function createUser(req, res, next) {
         const { firstName, lastName, username, password } = req.body;
         const userExists = !!(yield userModel_1.User.count({ username }));
         if (userExists) {
-            console.log('here');
-            res.status(409).send({ error: 'A user with that username already exists' });
+            return res.status(409).send({ error: 'A user with that username already exists' });
         }
-        // hash pwd
-        bcryptjs_1.default.genSalt(10, function onSaltGenerated(err, salt) {
-            if (err) {
-                next(err);
-            }
-            bcryptjs_1.default.hash(password, salt, function onHashGenerated(err, hash) {
-                if (err) {
-                    next(err);
-                }
-                // create new user
-                const user = new userModel_1.User({
-                    firstName,
-                    lastName,
-                    username,
-                    hash,
-                });
-                user.save(function onUserSaved(err) {
-                    if (err) {
-                        return next(err);
-                    }
-                    res.send({ user });
-                });
+        try {
+            const salt = yield bcryptjs_1.default.genSalt(10);
+            const hash = yield bcryptjs_1.default.hash(password, salt);
+            const user = new userModel_1.User({
+                firstName,
+                lastName,
+                username,
+                hash,
             });
-        });
+            user.save(function onUserSaved(err) {
+                if (err) {
+                    return next(err);
+                }
+                res.send({ user });
+            });
+        }
+        catch (err) {
+            next(err);
+        }
     });
 }
 function updateUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { userId } = req.params;
+        if (!mongodb_1.ObjectId.isValid(userId))
+            return res.sendStatus(400);
+        const userExists = yield userModel_1.User.findById(userId);
+        if (!userExists)
+            return res.sendStatus(404);
         const { firstName, lastName, username, password, isAuthor } = req.body;
-        bcryptjs_1.default.genSalt(10, function onSaltGenerated(err, salt) {
-            if (err) {
-                next(err);
-            }
-            bcryptjs_1.default.hash(password, salt, function onHashGenerated(err, hash) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    if (err) {
-                        next(err);
-                    }
-                    try {
-                        const user = yield userModel_1.User.findByIdAndUpdate(userId, {
-                            firstName,
-                            lastName,
-                            username,
-                            hash,
-                            isAuthor,
-                        });
-                        console.log(`User ${userId} has been updated: ${username} - ${lastName}, ${firstName}`);
-                        res.send({ user });
-                    }
-                    catch (err) {
-                        next(err);
-                    }
-                });
+        const usernameTaken = !!(yield userModel_1.User.count({ username }));
+        if (usernameTaken) {
+            return res.sendStatus(409);
+        }
+        try {
+            const salt = yield bcryptjs_1.default.genSalt(10);
+            const hash = yield bcryptjs_1.default.hash(password, salt);
+            const user = yield userModel_1.User.findByIdAndUpdate(userId, {
+                firstName,
+                lastName,
+                username,
+                hash,
+                isAuthor,
             });
-        });
+            console.log(`User ${userId} has been updated: ${username} - ${lastName}, ${firstName}`);
+            res.send({ user });
+        }
+        catch (err) {
+            next(err);
+        }
     });
 }
 function deleteUser(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { userId } = req.params;
+        if (!mongodb_1.ObjectId.isValid(userId))
+            return res.sendStatus(400);
+        const userExists = yield userModel_1.User.findById(userId);
+        if (!userExists)
+            return res.sendStatus(404);
         try {
             yield userModel_1.User.findByIdAndDelete(userId);
             console.log(`User ${userId} has been deleted`);
@@ -140,7 +122,6 @@ function deleteUser(req, res, next) {
 const userController = {
     getUsers,
     getUser,
-    getUserPosts,
     createUser,
     updateUser,
     deleteUser,

@@ -48,7 +48,6 @@ router.post('/:postId/comments', [
   onValidated,
   commentController.createComment,
 ]);
-
 router.put('/:postId/comments/:commentId', [
   check('body')
     .exists()

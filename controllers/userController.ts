@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 
 import { User } from '../models/userModel';
-import { Post } from "../models/postModel";
+import { ObjectId } from 'mongodb';
 
 async function getUsers(_req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -13,85 +13,71 @@ async function getUsers(_req: Request, res: Response, next: NextFunction): Promi
   }
 }
 
-async function getUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-  if (req.params["userId"]) {
-    try {
-      const user = await User.findById(req.params["userId"]);
-      res.send({ user });
-    } catch (err) {
-      next(err);
-    }
-  } else {
-    res.sendStatus(400);
+async function getUser(req: Request, res: Response, next: NextFunction) {
+  if (!ObjectId.isValid(req.params['userId'])) { return res.sendStatus(400); } // invalid BSON string
+  try {
+    const user = await User.findById(req.params['userId']);
+    if (!user) return res.sendStatus(404);
+    res.send({ user });
+  } catch (err) {
+    next(err);
   }
 }
 
-async function getUserPosts(req: Request, res: Response, next: NextFunction): Promise<void> {
-  if (req.params['userId']) {
-    try {
-      const posts = await Post.find({ userId: req.params["userId"] });
-      res.send({ posts });
-    } catch (err) {
-        next(err);
-    }
-  } else {
-    res.sendStatus(400);
-  }
-}
-
-async function createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+async function createUser(req: Request, res: Response, next: NextFunction) {
   const { firstName, lastName, username, password } = req.body;
   const userExists = !!await User.count({ username });
   if (userExists) {
-    console.log('here')
-    res.status(409).send({ error: 'A user with that username already exists' });
+    return res.status(409).send({ error: 'A user with that username already exists' });
   }
-  // hash pwd
-  bcrypt.genSalt(10, function onSaltGenerated(err, salt) {
-    if (err) { next(err); }
-    bcrypt.hash(password, salt, function onHashGenerated(err, hash) {
-      if (err) { next(err) }
-      // create new user
-      const user = new User({
-        firstName,
-        lastName,
-        username,
-        hash,
-      });
-      user.save(function onUserSaved(err) {
-        if (err) { return next(err); }
-        res.send({ user });
-      });
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    const user = new User({
+      firstName,
+      lastName,
+      username,
+      hash,
     });
-  });
+    user.save(function onUserSaved(err) {
+      if (err) { return next(err); }
+      res.send({ user });
+    });
+  } catch (err) {
+    next(err);
+  }
 }
 
-async function updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+async function updateUser(req: Request, res: Response, next: NextFunction) {
   const { userId } = req.params;
+  if (!ObjectId.isValid(userId)) return res.sendStatus(400);
+  const userExists = await User.findById(userId);
+  if (!userExists) return res.sendStatus(404);
   const { firstName, lastName, username, password, isAuthor } = req.body;
-  bcrypt.genSalt(10, function onSaltGenerated(err, salt) {
-    if (err) { next(err); }
-    bcrypt.hash(password, salt, async function onHashGenerated(err, hash) {
-      if (err) { next(err); }
-      try {
-        const user = await User.findByIdAndUpdate(userId, {
-          firstName,
-          lastName,
-          username,
-          hash,
-          isAuthor,
-        });
-        console.log(`User ${userId} has been updated: ${username} - ${lastName}, ${firstName}`);
-        res.send({ user });
-      } catch (err) {
-        next(err);
-      }
+  const usernameTaken = !! await User.count({ username });
+  if (usernameTaken) { return res.sendStatus(409); }
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    const user = await User.findByIdAndUpdate(userId, {
+      firstName,
+      lastName,
+      username,
+      hash,
+      isAuthor,
     });
-  });
+    console.log(`User ${userId} has been updated: ${username} - ${lastName}, ${firstName}`);
+    res.send({ user });
+  } catch (err) {
+    next(err);
+  }
 }
 
-async function deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+async function deleteUser(req: Request, res: Response, next: NextFunction) {
   const { userId } = req.params;
+  if (!ObjectId.isValid(userId)) return res.sendStatus(400);
+  const userExists = await User.findById(userId);
+  if (!userExists) return res.sendStatus(404);
   try {
     await User.findByIdAndDelete(userId);
     console.log(`User ${userId} has been deleted`);
@@ -104,7 +90,6 @@ async function deleteUser(req: Request, res: Response, next: NextFunction): Prom
 const userController = {
   getUsers,
   getUser,
-  getUserPosts,
   createUser,
   updateUser,
   deleteUser,

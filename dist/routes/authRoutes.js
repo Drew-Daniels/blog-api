@@ -21,11 +21,11 @@ router.post('/', function handleLogin(req, res, next) {
             return next(err);
         }
         if (!user) {
-            return res.status(401).end();
+            return res.sendStatus(401);
         }
         req.login(user, { session: false }, function onUserLoggedIn(err) {
             if (err) {
-                res.send(err);
+                next(err);
             }
         });
         // generate signed token
@@ -62,10 +62,4 @@ router.post('/signup', [
     utils_1.onValidated,
     userController_1.default.createUser,
 ]);
-router.delete('/', function handleLogout(req, res) {
-    // verify token, logout user
-    console.log(req);
-    console.log(res);
-    res.sendStatus(200);
-});
 exports.default = router;

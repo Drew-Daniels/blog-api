@@ -11,6 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const postModel_1 = require("../models/postModel");
 const commentModel_1 = require("../models/commentModel");
+const mongodb_1 = require("mongodb");
+const userModel_1 = require("../models/userModel");
 function getPosts(_req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -31,22 +33,28 @@ function getPosts(_req, res, next) {
 }
 function getPost(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (req.params['postId']) {
-            try {
-                const post = yield postModel_1.Post.findById(req.params['postId']);
-                // TODO: hydrate w/ comments
-                res.status(200).json({ post });
-            }
-            catch (err) {
-                next(err);
-            }
+        if (!mongodb_1.ObjectId.isValid(req.params['postId']))
+            return res.sendStatus(400);
+        try {
+            const post = yield postModel_1.Post.findById(req.params['postId']);
+            if (!post)
+                return res.sendStatus(404);
+            // TODO: hydrate w/ comments
+            return res.status(200).json({ post });
         }
-        res.status(400).end();
+        catch (err) {
+            next(err);
+        }
     });
 }
 function getUserPosts(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { userId } = req.params;
+        if (!mongodb_1.ObjectId.isValid(req.params['userId']))
+            return res.sendStatus(400); // invalid BSON string
+        const userExists = yield userModel_1.User.findById(userId);
+        if (!userExists)
+            return res.sendStatus(404);
         try {
             const posts = yield postModel_1.Post.find({ author: userId });
             res.send({ posts });
@@ -95,10 +103,15 @@ function updatePost(req, res, next) {
 function deletePost(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { postId } = req.params;
+        if (!mongodb_1.ObjectId.isValid(postId))
+            return res.sendStatus(400);
         try {
+            const postExists = !!(yield postModel_1.Post.findById(postId));
+            if (!postExists)
+                return res.sendStatus(404);
             yield postModel_1.Post.findByIdAndDelete(postId);
             console.log(`Post ${postId} has been deleted`);
-            res.sendStatus(200);
+            return res.sendStatus(200);
         }
         catch (err) {
             next(err);

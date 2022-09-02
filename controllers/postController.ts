@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { Types } from "mongoose";
 import { IPost, Post } from '../models/postModel';
 import { IComment, Comment } from '../models/commentModel';
+import {ObjectId} from "mongodb";
+import { User } from "../models/userModel";
 
 interface ILeanPost extends IPost {
   _id: Types.ObjectId;
@@ -25,23 +27,25 @@ async function getPosts(_req: Request, res: Response, next: NextFunction): Promi
   }
 }
 
-async function getPost(req: Request, res: Response, next: NextFunction): Promise<void> {
-  if (req.params['postId']) {
-    try {
-      const post = await Post.findById(req.params['postId']);
-      // TODO: hydrate w/ comments
-      res.status(200).json({ post });
-    } catch (err) {
-        next(err);
-    }
+async function getPost(req: Request, res: Response, next: NextFunction) {
+  if (!ObjectId.isValid(req.params['postId'])) return res.sendStatus(400);
+  try {
+    const post = await Post.findById(req.params['postId']);
+    if (!post) return res.sendStatus(404);
+    // TODO: hydrate w/ comments
+    return res.status(200).json({ post });
+  } catch (err) {
+      next(err);
   }
-  res.status(400).end();
 }
 
-async function getUserPosts(req: Request, res: Response, next: NextFunction): Promise<void> {
+async function getUserPosts(req: Request, res: Response, next: NextFunction) {
   const { userId } = req.params;
+  if (!ObjectId.isValid(req.params['userId'])) return res.sendStatus(400); // invalid BSON string
+  const userExists = await User.findById(userId);
+  if (!userExists) return res.sendStatus(404);
   try {
-    const posts = await Post.find({ author: userId })
+    const posts = await Post.find({ author: userId });
     res.send({ posts });
   } catch (err) {
     next(err);
@@ -78,12 +82,15 @@ async function updatePost(req: Request, res: Response, next: NextFunction): Prom
   }
 }
 
-async function deletePost(req: Request, res: Response, next: NextFunction): Promise<void> {
+async function deletePost(req: Request, res: Response, next: NextFunction) {
   const { postId } = req.params;
+  if (!ObjectId.isValid(postId)) return res.sendStatus(400);
   try {
+    const postExists = !! await Post.findById(postId);
+    if (!postExists) return res.sendStatus(404);
     await Post.findByIdAndDelete(postId);
     console.log(`Post ${postId} has been deleted`);
-    res.sendStatus(200);
+    return res.sendStatus(200);
   } catch (err) {
     next(err);
   }

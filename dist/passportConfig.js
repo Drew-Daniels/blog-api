@@ -3,10 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const dotenv_1 = __importDefault(require("dotenv"));
+const dotenv_expand_1 = __importDefault(require("dotenv-expand"));
 const passport_1 = __importDefault(require("passport"));
 const passport_local_1 = require("passport-local");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const passport_jwt_1 = __importDefault(require("passport-jwt"));
+var env = dotenv_1.default.config();
+dotenv_expand_1.default.expand(env);
 const userModel_1 = require("./models/userModel");
 var JwtStrategy = passport_jwt_1.default.Strategy;
 var ExtractJwt = passport_jwt_1.default.ExtractJwt;
