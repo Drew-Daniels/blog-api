@@ -17,7 +17,6 @@ function getPosts(_req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const postsMinusComments = yield postModel_1.Post.find().lean();
-            // TODO: Create an interface that
             const postsPlusComments = yield Promise.all(postsMinusComments.map(function supplyPostWithComments(post) {
                 return __awaiter(this, void 0, void 0, function* () {
                     const comments = yield commentModel_1.Comment.find({ post: post._id }).lean();

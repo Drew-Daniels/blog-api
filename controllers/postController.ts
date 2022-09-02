@@ -16,7 +16,6 @@ interface PostWithComments extends ILeanPost {
 async function getPosts(_req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const postsMinusComments = await Post.find().lean();
-    // TODO: Create an interface that
     const postsPlusComments = await Promise.all(postsMinusComments.map(async function supplyPostWithComments(post: IPost): Promise<PostWithComments> {
       const comments = await Comment.find({ post: post._id }).lean();
       return { ...post, comments: comments }
